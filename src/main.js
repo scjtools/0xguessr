@@ -18,6 +18,10 @@ import {
   resetTimestamp, getTimestampProgress, tsToDate, ETH_GENESIS_TS,
 } from './game/timestamp-scan.js';
 import { resetRandstorm, getRandstormSeed } from './game/randstorm.js';
+import { resetLibbitcoin, getLibbitcoinSeed } from './game/libbitcoin.js';
+import {
+  loadCrosschainKeys, getCrosschainProgress, resetCrosschain, BUILTIN_CROSSCHAIN_KEYS,
+} from './game/crosschain.js';
 
 const AUTOSPIN_DELAY_MS = 250;
 const AUTOSPIN_DELAY_NO_DELAY_MS = 16;
@@ -132,7 +136,9 @@ async function main() {
   const panelPuzzle    = document.getElementById('panel-puzzle');
   const panelTimestamp = document.getElementById('panel-timestamp');
   const panelProfanity = document.getElementById('panel-profanity');
-  const panelRandstorm = document.getElementById('panel-randstorm');
+  const panelRandstorm  = document.getElementById('panel-randstorm');
+  const panelLibbitcoin = document.getElementById('panel-libbitcoin');
+  const panelCrosschain = document.getElementById('panel-crosschain');
 
   const allPanels = {
     random:    panelRandom,
@@ -141,6 +147,8 @@ async function main() {
     timestamp: panelTimestamp,
     profanity: panelProfanity,
     randstorm: panelRandstorm,
+    libbitcoin: panelLibbitcoin,
+    crosschain: panelCrosschain,
   };
 
   function setMode(mode) {
@@ -193,6 +201,46 @@ async function main() {
     resetRandstorm(seed);
     document.getElementById('randstorm-status').textContent =
       `Seed ${seed.toLocaleString('en-US')} / 4,294,967,295`;
+  });
+
+  // Libbitcoin controls
+  document.getElementById('libbitcoin-set').addEventListener('click', () => {
+    const raw = parseInt(document.getElementById('libbitcoin-start').value, 10);
+    const seed = isNaN(raw) ? 0 : Math.max(0, Math.min(raw, 0xFFFFFFFF));
+    resetLibbitcoin(seed);
+    document.getElementById('libbitcoin-status').textContent =
+      `Seed ${seed.toLocaleString('en-US')} / 4,294,967,295`;
+  });
+
+  // Cross-chain controls
+  function loadCCKeys(keys) {
+    loadCrosschainKeys(keys);
+    const { total } = getCrosschainProgress();
+    document.getElementById('cc-status').textContent =
+      `${total.toLocaleString('en-US')} key${total === 1 ? '' : 's'} loaded.`;
+  }
+
+  document.getElementById('cc-preset-builtin').addEventListener('click', () => {
+    loadCCKeys(BUILTIN_CROSSCHAIN_KEYS);
+  });
+
+  document.getElementById('cc-paste').addEventListener('input', (e) => {
+    const lines = e.target.value.split('\n').filter(l => l.trim());
+    if (lines.length) loadCCKeys(lines);
+  });
+
+  document.getElementById('cc-load-url').addEventListener('click', async () => {
+    const url = document.getElementById('cc-url').value.trim();
+    if (!url) return;
+    document.getElementById('cc-status').textContent = 'Fetching…';
+    try {
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const text = await resp.text();
+      loadCCKeys(text.split('\n'));
+    } catch (err) {
+      document.getElementById('cc-status').textContent = `Error: ${err.message}`;
+    }
   });
 
   const log = new Log(document.getElementById('log'));
@@ -374,10 +422,17 @@ async function main() {
       [, result] = await Promise.all([spinAnim, spin(spinOpts)]);
     }
 
-    // Brain wallet list exhausted
+    // Scan mode exhausted
     if (result.exhausted) {
-      if (!noDelay) await classic.stopSpin(false);
-      log.append('Brain wallet scan complete — list exhausted.');
+      if (!noDelay) reels.stopSpin(false);
+      const exhaustedLabels = {
+        profanity:  'Profanity scan complete — all 4,294,967,296 seeds checked.',
+        timestamp:  'Timestamp scan complete — range exhausted.',
+        randstorm:  'Randstorm scan complete — all 4,294,967,296 seeds checked.',
+        libbitcoin: 'Libbitcoin scan complete — all 4,294,967,296 seeds checked.',
+        crosschain: 'Cross-chain scan complete — list exhausted.',
+      };
+      log.append(exhaustedLabels[currentMode] || 'Scan complete.');
       if (autospinToggle.checked) autospinToggle.checked = false;
       return;
     }
@@ -409,6 +464,16 @@ async function main() {
       document.getElementById('randstorm-status').textContent =
         `Seed ${s.toLocaleString('en-US')} / 4,294,967,295`;
       logLine = `[randstorm s=${s}] addr=${shorten(result.derived.address, 6)}`;
+    } else if (result.mode === 'libbitcoin') {
+      const s = result.meta.seed;
+      document.getElementById('libbitcoin-status').textContent =
+        `Seed ${s.toLocaleString('en-US')} / 4,294,967,295`;
+      logLine = `[libbitcoin s=${s}] addr=${shorten(result.derived.address, 6)}`;
+    } else if (result.mode === 'crosschain') {
+      const { current, total } = getCrosschainProgress();
+      document.getElementById('cc-status').textContent =
+        `${current.toLocaleString('en-US')} / ${total.toLocaleString('en-US')} keys checked`;
+      logLine = `[cross-chain ${result.meta.keyHex.slice(0, 8)}…] addr=${shorten(result.derived.address, 6)}`;
     } else {
       logLine = `key=${shorten(result.privKeyHex, 6)} addr=${shorten(result.derived.address, 6)}`;
     }

@@ -5,6 +5,8 @@ import { nextProfanityKey } from './profanity.js';
 import { nextPuzzleKey } from './puzzle.js';
 import { nextTimestampKey } from './timestamp-scan.js';
 import { nextRandstormKey } from './randstorm.js';
+import { nextLibbitcoinKey } from './libbitcoin.js';
+import { nextCrosschainKey } from './crosschain.js';
 
 export async function spin({ devWin = null, mode = 'random', bipWords = 12 } = {}) {
   if (devWin) {
@@ -47,6 +49,18 @@ export async function spin({ devWin = null, mode = 'random', bipWords = 12 } = {
     if (r.exhausted) return { win: false, exhausted: true };
     privKey = r.key;
     meta    = { seed: r.seed };
+
+  } else if (mode === 'libbitcoin') {
+    const r = nextLibbitcoinKey();
+    if (r.exhausted) return { win: false, exhausted: true };
+    privKey = r.key;
+    meta    = { seed: r.seed };
+
+  } else if (mode === 'crosschain') {
+    const r = nextCrosschainKey();
+    if (r.exhausted) return { win: false, exhausted: true };
+    privKey = r.key;
+    meta    = { keyHex: r.keyHex };
 
   } else {
     privKey = randomPrivKey();

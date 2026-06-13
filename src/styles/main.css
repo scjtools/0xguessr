@@ -320,6 +320,74 @@ footer {
   color: var(--win);
 }
 
+/* Cross-chain panel */
+.preset-row-cc {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+.preset-btn {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  padding: 0.3rem 0.7rem;
+  background: transparent;
+  border: 1px solid var(--ink-dim);
+  color: var(--ink);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.preset-btn:hover { border-color: var(--accent); color: var(--accent); }
+.wordlist-paste {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--bg-field, #111);
+  border: 1px solid var(--ink-dim);
+  border-radius: 4px;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  padding: 0.4rem 0.6rem;
+  resize: vertical;
+  margin-bottom: 0.4rem;
+}
+.wordlist-url-row {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+.wordlist-url-input {
+  flex: 1;
+  background: var(--bg-field, #111);
+  border: 1px solid var(--ink-dim);
+  border-radius: 4px;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  padding: 0.35rem 0.55rem;
+}
+.wordlist-url-row button {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  padding: 0.35rem 0.7rem;
+  background: transparent;
+  border: 1px solid var(--ink-dim);
+  color: var(--ink);
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.15s, color 0.15s;
+}
+.wordlist-url-row button:hover { border-color: var(--accent); color: var(--accent); }
+.wordlist-status {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--win);
+}
+
 /* Live stats bar */
 .live-bar {
   padding: 0.35rem 0 0.6rem;

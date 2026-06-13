@@ -43,6 +43,8 @@
         <button class="mode-tab" data-mode="timestamp" role="tab">Timestamp</button>
         <button class="mode-tab" data-mode="profanity" role="tab">Profanity</button>
         <button class="mode-tab" data-mode="randstorm" role="tab">Randstorm</button>
+        <button class="mode-tab" data-mode="libbitcoin" role="tab">Libbitcoin</button>
+        <button class="mode-tab" data-mode="crosschain" role="tab">Cross-chain</button>
       </div>
 
       <div class="mode-panel" id="panel-random">
@@ -125,6 +127,41 @@
           <button id="randstorm-set" type="button">Set</button>
         </div>
         <p class="scan-status" id="randstorm-status">Seed 0 / 4,294,967,295</p>
+      </div>
+
+      <div class="mode-panel" id="panel-libbitcoin" hidden>
+        <p class="mode-desc">The "Milk Sad" exploit (CVE-2023-39910, Aug 2023). Libbitcoin's <code>bx seed</code> command — featured in the book <em>Mastering Bitcoin</em> — seeded mt19937 with nanoseconds-since-epoch cast to a 32-bit integer. Same effective keyspace as Profanity, completely different algorithm. Exploited in the wild; over 2,600 wallets drained.</p>
+        <div class="mode-stats">
+          <span class="mode-stat"><span class="mode-stat-label">Keyspace</span><span class="mode-stat-val">2<sup>32</sup> (4.29 billion)</span></span>
+          <span class="mode-stat"><span class="mode-stat-label">Algorithm</span><span class="mode-stat-val">mt19937 (32-bit)</span></span>
+          <span class="mode-stat"><span class="mode-stat-label">Disclosed</span><span class="mode-stat-val">August 2023</span></span>
+        </div>
+        <div class="scan-row">
+          <label class="scan-label">Start seed (0 – 4,294,967,295)</label>
+          <input type="number" id="libbitcoin-start" class="scan-input" min="0" max="4294967295" placeholder="0" />
+          <button id="libbitcoin-set" type="button">Set</button>
+        </div>
+        <p class="scan-status" id="libbitcoin-status">Seed 0 / 4,294,967,295</p>
+      </div>
+
+      <div class="mode-panel" id="panel-crosschain" hidden>
+        <p class="mode-desc">Some users reused the exact same private key across Bitcoin and Ethereum. If that key was exposed on Bitcoin — through nonce reuse, weak RNG, or published research — the ETH wallet is equally open. Load a list of known-compromised hex private keys and check their Ethereum addresses.</p>
+        <div class="mode-stats">
+          <span class="mode-stat"><span class="mode-stat-label">Built-in list</span><span class="mode-stat-val">35 known keys</span></span>
+          <span class="mode-stat"><span class="mode-stat-label">Sources</span><span class="mode-stat-val">nonce reuse, puzzle, research</span></span>
+          <span class="mode-stat"><span class="mode-stat-label">Advantage</span><span class="mode-stat-val">known exposure, not guessing</span></span>
+        </div>
+        <div class="preset-row-cc">
+          <button class="preset-btn" id="cc-preset-builtin" type="button">Built-in list</button>
+        </div>
+        <textarea id="cc-paste" class="wordlist-paste" rows="3" spellcheck="false"
+          placeholder="Or paste your own — one 64-hex private key per line…"></textarea>
+        <div class="wordlist-url-row">
+          <input type="text" id="cc-url" class="wordlist-url-input"
+            placeholder="Or load from URL (one key per line)…" spellcheck="false" />
+          <button id="cc-load-url" type="button">Fetch</button>
+        </div>
+        <p class="wordlist-status" id="cc-status">No list loaded.</p>
       </div>
 
       <section class="machine">
