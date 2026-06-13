@@ -83,11 +83,21 @@ export class BloomFilter {
 
   static deserialize(buf) {
     const bytes = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
-    for (let i = 0; i < 4; i++) {
-      if (bytes[i] !== MAGIC[i]) throw new Error('bad bloom magic');
+    if (bytes[0] !== 0x42 || bytes[1] !== 0x4c || bytes[2] !== 0x4d) {
+      throw new Error('bad bloom magic');
     }
-    const m = readU32LE(bytes, 8);
-    const k = bytes[12];
+    let m, k;
+    if (bytes[3] === 0x31) {
+      // Original BLM1: magic(4) | n(4) | m(4) | k(1) | pad(3) | bits
+      m = readU32LE(bytes, 8);
+      k = bytes[12];
+    } else if (bytes[3] === 0x01) {
+      // External BLM\x01: magic(4) | m(4) | k(4) | n(4) | bits
+      m = readU32LE(bytes, 4);
+      k = readU32LE(bytes, 8);
+    } else {
+      throw new Error('bad bloom magic');
+    }
     const bits = bytes.slice(HEADER_BYTES, HEADER_BYTES + m / 8);
     return new BloomFilter(m, k, bits);
   }

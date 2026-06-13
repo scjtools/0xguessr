@@ -1,13 +1,9 @@
 {
-  "name": "satoshi-guesser",
+  "name": "0xguesser",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "fetch:patoshi": "node scripts/fetch-patoshi.js",
-    "build:wallets": "node scripts/build-wallet-set.js",
-    "prebuild": "npm run build:wallets",
-    "predev": "npm run build:wallets",
     "dev": "vite",
     "build": "vite build",
     "preview": "npm run build && wrangler dev",

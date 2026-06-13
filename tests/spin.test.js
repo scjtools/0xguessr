@@ -1,53 +1,38 @@
-// End-to-end-ish: feed known input through the spin pipeline by directly
-// exercising the data layer the same way main.js does, but in Node.
+// End-to-end: exercises the crypto derivation pipeline the same way spin.js does.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
-import { sha256 } from '@noble/hashes/sha256';
-import { base58check } from '@scure/base';
+import { existsSync } from 'node:fs';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-import { BloomFilter } from '../src/game/bloom.js';
-import { WalletTable } from '../src/game/wallet-table.js';
-import { deriveAll, hexToBytes } from '../src/game/crypto.js';
+import { deriveAll, hexToBytes, bytesToHex } from '../src/game/crypto.js';
 
-const b58c = base58check(sha256);
-const ROOT = resolve(import.meta.dirname, '..');
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const BLOOM_PATH = resolve(ROOT, 'public/data/eth-bloom.bin');
 
-function decodeP2PKH(addr) {
-  return b58c.decode(addr).slice(1);
-}
-
-test('miss: random key does not match anything', () => {
-  const bloom = BloomFilter.deserialize(
-    readFileSync(resolve(ROOT, 'public/data/satoshi-bloom.bin'))
+test('derive pipeline produces valid ETH address from known privkey', () => {
+  const priv = hexToBytes(
+    '0000000000000000000000000000000000000000000000000000000000000001'
   );
-  const tbl = new WalletTable(
-    readFileSync(resolve(ROOT, 'public/data/satoshi-wallets.bin'))
-  );
+  const d = deriveAll(priv);
+  assert.equal(d.addressBytes.length, 20);
+  assert.match(d.address, /^0x[0-9a-f]{40}$/i);
+  assert.equal(d.address, '0x' + bytesToHex(d.addressBytes));
+});
+
+test('miss: random key does not match eth-bloom (skipped if file absent)', async (t) => {
+  if (!existsSync(BLOOM_PATH)) {
+    t.skip('eth-bloom.bin not yet placed in public/data/');
+    return;
+  }
+  // Dynamically import to avoid top-level fetch usage in Node.
+  const { BloomFilter } = await import('../src/game/bloom.js');
+  const { readFileSync } = await import('node:fs');
+  const bloom = BloomFilter.deserialize(readFileSync(BLOOM_PATH));
+
   const priv = new Uint8Array(32);
   crypto.getRandomValues(priv);
   const d = deriveAll(priv);
-  const bloomHit =
-    bloom.has(d.hash160Compressed) || bloom.has(d.hash160Uncompressed);
-  if (bloomHit) {
-    // Confirm against the table — should be null (rare bloom FP).
-    const tableHit =
-      tbl.lookup(d.hash160Compressed) ?? tbl.lookup(d.hash160Uncompressed);
-    assert.equal(tableHit, null, 'bloom hit must be confirmed false by table');
-  } else {
-    assert.ok(true);
-  }
-});
-
-test('hit: planted hash160 of genesis matches and reads balance', () => {
-  const bloom = BloomFilter.deserialize(
-    readFileSync(resolve(ROOT, 'public/data/satoshi-bloom.bin'))
-  );
-  const tbl = new WalletTable(
-    readFileSync(resolve(ROOT, 'public/data/satoshi-wallets.bin'))
-  );
-  const h160 = decodeP2PKH('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa');
-  assert.ok(bloom.has(h160));
-  assert.equal(tbl.lookup(h160), 5_000_000_000n);
+  // Bloom hit on a random address is astronomically unlikely (~1e-9).
+  assert.equal(bloom.has(d.addressBytes), false);
 });
