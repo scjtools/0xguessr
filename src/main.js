@@ -12,6 +12,9 @@ import { WinDialog } from './ui/win-dialog.js';
 import { sfx, setMuted, unlock } from './audio/audio.js';
 import { recordSpin, getStats, getTier, milestoneMessage } from './ui/stats.js';
 import { drawShareCard, downloadCard, copyCardToClipboard } from './ui/share-card.js';
+import {
+  loadWordlist, getProgress, resetScan, getBip39AllWords, BUILTIN_PHRASES,
+} from './game/brain-wallet.js';
 
 const AUTOSPIN_DELAY_MS = 250;
 const AUTOSPIN_DELAY_NO_DELAY_MS = 16;
@@ -109,11 +112,77 @@ function updateLiveBar(isAutospinning) {
 }
 
 async function main() {
+  // Mode state
+  let currentMode = 'random';
+  let bipWords = 12;
+
   const stats = await loadStats();
   loadBloom();
 
   renderHeaderStats(stats);
   updateLiveBar(false);
+
+  // Mode tabs
+  const modeTabs   = document.querySelectorAll('.mode-tab');
+  const panelBip   = document.getElementById('panel-bip39');
+  const panelBrain = document.getElementById('panel-brain');
+
+  function setMode(mode) {
+    currentMode = mode;
+    modeTabs.forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
+    panelBip.hidden   = mode !== 'bip39';
+    panelBrain.hidden = mode !== 'brain';
+  }
+  modeTabs.forEach(t => t.addEventListener('click', () => setMode(t.dataset.mode)));
+
+  // BIP39 word count
+  document.querySelectorAll('[name="bip-words"]').forEach(r =>
+    r.addEventListener('change', e => { bipWords = parseInt(e.target.value); }));
+
+  // Brain wallet wordlist helpers
+  function setWordlistStatus(msg, cls = '') {
+    const el = document.getElementById('wordlist-status');
+    el.textContent = msg;
+    el.className = 'wordlist-status' + (cls ? ' ' + cls : '');
+  }
+
+  function applyWordlist(phrases, label) {
+    loadWordlist(phrases);
+    const { total } = getProgress();
+    setWordlistStatus(`Loaded ${total.toLocaleString('en-US')} phrases — ${label}. Ready.`, 'loaded');
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  }
+
+  document.getElementById('preset-bip39-words').addEventListener('click', () => {
+    const words = getBip39AllWords();
+    applyWordlist(words, 'BIP39 all languages');
+    document.getElementById('preset-bip39-words').classList.add('active');
+  });
+
+  document.getElementById('preset-common').addEventListener('click', () => {
+    applyWordlist(BUILTIN_PHRASES, 'common phrases');
+    document.getElementById('preset-common').classList.add('active');
+  });
+
+  document.getElementById('wordlist-paste').addEventListener('input', e => {
+    const lines = e.target.value.split('\n');
+    applyWordlist(lines, 'custom paste');
+  });
+
+  document.getElementById('wordlist-load-url').addEventListener('click', async () => {
+    const url = document.getElementById('wordlist-url').value.trim();
+    if (!url) return;
+    setWordlistStatus('Fetching…');
+    try {
+      const text = await fetch(url).then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.text();
+      });
+      applyWordlist(text.split('\n'), url.split('/').pop());
+    } catch (err) {
+      setWordlistStatus(`Failed: ${err.message}`, 'error');
+    }
+  });
 
   const log = new Log(document.getElementById('log'));
   log.append(
@@ -285,12 +354,21 @@ async function main() {
 
     if (!noDelay) reels.startSpin();
 
+    const spinOpts = { devWin: forced, mode: currentMode, bipWords };
     let result;
     if (noDelay) {
-      result = await spin({ devWin: forced });
+      result = await spin(spinOpts);
     } else {
       const spinAnim = new Promise((r) => setTimeout(r, 1100));
-      [, result] = await Promise.all([spinAnim, spin({ devWin: forced })]);
+      [, result] = await Promise.all([spinAnim, spin(spinOpts)]);
+    }
+
+    // Brain wallet list exhausted
+    if (result.exhausted) {
+      if (!noDelay) await classic.stopSpin(false);
+      log.append('Brain wallet scan complete — list exhausted.');
+      if (autospinToggle.checked) autospinToggle.checked = false;
+      return;
     }
 
     recordSpinTime();
@@ -298,10 +376,16 @@ async function main() {
     updateLiveBar(autospinToggle.checked);
     if (milestone) showToast(milestoneMessage(milestone));
 
-    log.append(
-      `key=${shorten(result.privKeyHex, 6)} ` +
-        `addr=${shorten(result.derived.address, 6)}`
-    );
+    // Mode-specific log line
+    let logLine;
+    if (result.mnemonic) {
+      logLine = `[${result.mnemonic}] addr=${shorten(result.derived.address, 6)}`;
+    } else if (result.phrase != null) {
+      logLine = `"${result.phrase}" → ${shorten(result.derived.address, 6)}`;
+    } else {
+      logLine = `key=${shorten(result.privKeyHex, 6)} addr=${shorten(result.derived.address, 6)}`;
+    }
+    log.append(logLine);
 
     if (noDelay) {
       if (realisticMode) realistic.flashResult(result.privKeyHex, result.win);
@@ -313,7 +397,12 @@ async function main() {
     }
 
     if (result.win) {
-      log.append(`🎉 MATCH: ${result.derived.address} (≥1 ETH)`);
+      const winLabel = result.phrase
+        ? `brain wallet phrase: "${result.phrase}"`
+        : result.mnemonic
+          ? `BIP39: [${result.mnemonic}]`
+          : `key: ${result.privKeyHex}`;
+      log.append(`🎉 MATCH: ${result.derived.address} (≥1 ETH) — ${winLabel}`);
       sfx.win();
       if (autospinToggle.checked) autospinToggle.checked = false;
       winDialog.show(result);
