@@ -38,7 +38,6 @@
       <div class="mode-tabs" role="tablist">
         <button class="mode-tab active" data-mode="random" role="tab">Random</button>
         <button class="mode-tab" data-mode="bip39" role="tab">BIP39</button>
-        <button class="mode-tab" data-mode="brain" role="tab">Brain Wallet</button>
         <span class="tab-sep" aria-hidden="true"></span>
         <button class="mode-tab" data-mode="puzzle" role="tab">Puzzle</button>
         <button class="mode-tab" data-mode="timestamp" role="tab">Timestamp</button>
@@ -51,20 +50,6 @@
         <label class="radio-label"><input type="radio" name="bip-words" value="24"> 24 words</label>
       </div>
 
-      <div class="mode-panel" id="panel-brain" hidden>
-        <div class="preset-row">
-          <span class="preset-label">Presets:</span>
-          <button class="preset-btn" id="preset-bip39-words" type="button">BIP39 all languages</button>
-          <button class="preset-btn" id="preset-common" type="button">Common phrases</button>
-        </div>
-        <textarea id="wordlist-paste" class="wordlist-paste" rows="3" spellcheck="false"
-          placeholder="Or paste your own list — one phrase per line…"></textarea>
-        <div class="wordlist-url-row">
-          <input type="text" id="wordlist-url" class="wordlist-url-input"
-            placeholder="Or load from URL (e.g. Webster's word list)…" spellcheck="false" />
-          <button id="wordlist-load-url" type="button">Fetch</button>
-        </div>
-        <p class="wordlist-status" id="wordlist-status">No list loaded.</p>
       </div>
 
       <div class="mode-panel" id="panel-puzzle" hidden>

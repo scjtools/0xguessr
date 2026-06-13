@@ -1,7 +1,6 @@
 import { deriveAll, randomPrivKey, bytesToHex } from './crypto.js';
 import { checkAddress } from './wallets.js';
 import { randomMnemonic, mnemonicToPrivKey } from './bip39-derive.js';
-import { nextPhrase, phraseToPrivKey } from './brain-wallet.js';
 import { nextProfanityKey } from './profanity.js';
 import { nextPuzzleKey } from './puzzle.js';
 import { nextTimestampKey } from './timestamp-scan.js';
@@ -20,17 +19,11 @@ export async function spin({ devWin = null, mode = 'random', bipWords = 12 } = {
 
   let privKey;
   let mnemonic = null;
-  let phrase   = null;
   let meta     = null;
 
   if (mode === 'bip39') {
     mnemonic = randomMnemonic(bipWords);
     privKey  = mnemonicToPrivKey(mnemonic);
-
-  } else if (mode === 'brain') {
-    phrase = nextPhrase();
-    if (phrase === null) return { win: false, exhausted: true };
-    privKey = phraseToPrivKey(phrase);
 
   } else if (mode === 'profanity') {
     const r = nextProfanityKey();
@@ -69,7 +62,6 @@ export async function spin({ devWin = null, mode = 'random', bipWords = 12 } = {
     derived,
     match: hit,
     mnemonic,
-    phrase,
     meta,
     mode,
   };

@@ -12,9 +12,6 @@ import { WinDialog } from './ui/win-dialog.js';
 import { sfx, setMuted, unlock } from './audio/audio.js';
 import { recordSpin, getStats, getTier, milestoneMessage } from './ui/stats.js';
 import { drawShareCard, downloadCard, copyCardToClipboard } from './ui/share-card.js';
-import {
-  loadWordlist, getProgress, resetScan, getBip39AllWords, BUILTIN_PHRASES,
-} from './game/brain-wallet.js';
 import { resetProfanity, getProfanitySeed } from './game/profanity.js';
 import { resetPuzzle, getPuzzleCounter } from './game/puzzle.js';
 import {
@@ -131,7 +128,6 @@ async function main() {
   // Mode tabs
   const modeTabs   = document.querySelectorAll('.mode-tab');
   const panelBip       = document.getElementById('panel-bip39');
-  const panelBrain     = document.getElementById('panel-brain');
   const panelPuzzle    = document.getElementById('panel-puzzle');
   const panelTimestamp = document.getElementById('panel-timestamp');
   const panelProfanity = document.getElementById('panel-profanity');
@@ -139,7 +135,6 @@ async function main() {
 
   const allPanels = {
     bip39:     panelBip,
-    brain:     panelBrain,
     puzzle:    panelPuzzle,
     timestamp: panelTimestamp,
     profanity: panelProfanity,
@@ -156,36 +151,6 @@ async function main() {
   // BIP39 word count
   document.querySelectorAll('[name="bip-words"]').forEach(r =>
     r.addEventListener('change', e => { bipWords = parseInt(e.target.value); }));
-
-  // Brain wallet wordlist helpers
-  function setWordlistStatus(msg, cls = '') {
-    const el = document.getElementById('wordlist-status');
-    el.textContent = msg;
-    el.className = 'wordlist-status' + (cls ? ' ' + cls : '');
-  }
-
-  function applyWordlist(phrases, label) {
-    loadWordlist(phrases);
-    const { total } = getProgress();
-    setWordlistStatus(`Loaded ${total.toLocaleString('en-US')} phrases — ${label}. Ready.`, 'loaded');
-    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
-  }
-
-  document.getElementById('preset-bip39-words').addEventListener('click', () => {
-    const words = getBip39AllWords();
-    applyWordlist(words, 'BIP39 all languages');
-    document.getElementById('preset-bip39-words').classList.add('active');
-  });
-
-  document.getElementById('preset-common').addEventListener('click', () => {
-    applyWordlist(BUILTIN_PHRASES, 'common phrases');
-    document.getElementById('preset-common').classList.add('active');
-  });
-
-  document.getElementById('wordlist-paste').addEventListener('input', e => {
-    const lines = e.target.value.split('\n');
-    applyWordlist(lines, 'custom paste');
-  });
 
   // Puzzle controls
   document.getElementById('puzzle-set').addEventListener('click', () => {
@@ -226,21 +191,6 @@ async function main() {
     resetRandstorm(seed);
     document.getElementById('randstorm-status').textContent =
       `Seed ${seed.toLocaleString('en-US')} / 4,294,967,295`;
-  });
-
-  document.getElementById('wordlist-load-url').addEventListener('click', async () => {
-    const url = document.getElementById('wordlist-url').value.trim();
-    if (!url) return;
-    setWordlistStatus('Fetching…');
-    try {
-      const text = await fetch(url).then(r => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.text();
-      });
-      applyWordlist(text.split('\n'), url.split('/').pop());
-    } catch (err) {
-      setWordlistStatus(`Failed: ${err.message}`, 'error');
-    }
   });
 
   const log = new Log(document.getElementById('log'));
@@ -439,8 +389,6 @@ async function main() {
     let logLine;
     if (result.mnemonic) {
       logLine = `[${result.mnemonic}] addr=${shorten(result.derived.address, 6)}`;
-    } else if (result.phrase != null) {
-      logLine = `"${result.phrase}" → ${shorten(result.derived.address, 6)}`;
     } else if (result.mode === 'profanity') {
       const s = result.meta.seed;
       document.getElementById('profanity-status').textContent =
@@ -474,11 +422,9 @@ async function main() {
     }
 
     if (result.win) {
-      const winLabel = result.phrase
-        ? `brain wallet phrase: "${result.phrase}"`
-        : result.mnemonic
-          ? `BIP39: [${result.mnemonic}]`
-          : `key: ${result.privKeyHex}`;
+      const winLabel = result.mnemonic
+        ? `BIP39: [${result.mnemonic}]`
+        : `key: ${result.privKeyHex}`;
       log.append(`🎉 MATCH: ${result.derived.address} (≥1 ETH) — ${winLabel}`);
       sfx.win();
       if (autospinToggle.checked) autospinToggle.checked = false;
