@@ -45,6 +45,9 @@
         <button class="mode-tab" data-mode="randstorm" role="tab">Randstorm</button>
         <button class="mode-tab" data-mode="libbitcoin" role="tab">Libbitcoin</button>
         <button class="mode-tab" data-mode="crosschain" role="tab">Cross-chain</button>
+        <span class="tab-sep" aria-hidden="true"></span>
+        <button class="mode-tab" data-mode="ecdsa" role="tab">ECDSA Reuse</button>
+        <button class="mode-tab" data-mode="lattice" role="tab">Lattice</button>
       </div>
 
       <div class="mode-panel" id="panel-random">
@@ -162,6 +165,50 @@
           <button id="cc-load-url" type="button">Fetch</button>
         </div>
         <p class="wordlist-status" id="cc-status">No list loaded.</p>
+      </div>
+
+      <div class="mode-panel" id="panel-ecdsa" hidden>
+        <p class="mode-desc">If a wallet ever signed two transactions with the same random nonce <em>k</em>, both signatures share the same <code>r</code> value. One equation, one unknown — the private key falls out algebraically. Fetch an address's transaction history from Etherscan and check.</p>
+        <div class="mode-stats">
+          <span class="mode-stat"><span class="mode-stat-label">Condition</span><span class="mode-stat-val">same r in ≥2 txs</span></span>
+          <span class="mode-stat"><span class="mode-stat-label">Math</span><span class="mode-stat-val">k = (h₁−h₂)/(s₁−s₂) mod n</span></span>
+          <span class="mode-stat"><span class="mode-stat-label">Real cases</span><span class="mode-stat-val">Bitcoin 2013, PS3 2010</span></span>
+        </div>
+        <div class="scan-row">
+          <label class="scan-label">Etherscan API key</label>
+          <input type="text" id="ecdsa-apikey" class="scan-input" placeholder="YourApiKeyToken" spellcheck="false" />
+        </div>
+        <div class="scan-row">
+          <label class="scan-label">ETH address to analyse</label>
+          <input type="text" id="ecdsa-address" class="scan-input" placeholder="0x…" spellcheck="false" />
+          <button id="ecdsa-analyze" type="button">Analyse</button>
+        </div>
+        <p class="scan-status" id="ecdsa-status">Enter an address and click Analyse.</p>
+        <div id="ecdsa-log" class="analysis-log" hidden></div>
+      </div>
+
+      <div class="mode-panel" id="panel-lattice" hidden>
+        <p class="mode-desc">If an address's transactions used nonces <em>k</em> with predictable high bits (weak RNG, grinding, or a known wallet bug), LLL lattice reduction can recover the private key from as few as 2–4 signatures. Paste a JSON array of <code>[{hash, r, s}, …]</code> below.</p>
+        <div class="mode-stats">
+          <span class="mode-stat"><span class="mode-stat-label">Algorithm</span><span class="mode-stat-val">LLL basis reduction</span></span>
+          <span class="mode-stat"><span class="mode-stat-label">128-bit bias</span><span class="mode-stat-val">2 signatures</span></span>
+          <span class="mode-stat"><span class="mode-stat-label">64-bit bias</span><span class="mode-stat-val">~4 signatures</span></span>
+        </div>
+        <div class="scan-row">
+          <label class="scan-label">ETH address (for key verification)</label>
+          <input type="text" id="lattice-address" class="scan-input" placeholder="0x…" spellcheck="false" />
+        </div>
+        <div class="scan-row">
+          <label class="scan-label">Bias bits (leave blank = auto 128/96/64)</label>
+          <input type="number" id="lattice-bias" class="scan-input" min="1" max="254" placeholder="auto" />
+        </div>
+        <textarea id="lattice-sigs" class="wordlist-paste" rows="5" spellcheck="false"
+          placeholder='[{"hash":"0x…","r":"0x…","s":"0x…"}, …]'></textarea>
+        <div class="scan-row">
+          <button id="lattice-run" type="button">Run LLL</button>
+        </div>
+        <p class="scan-status" id="lattice-status">Paste signatures and click Run LLL.</p>
+        <div id="lattice-log" class="analysis-log" hidden></div>
       </div>
 
       <section class="machine">

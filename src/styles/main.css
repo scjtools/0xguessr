@@ -388,6 +388,24 @@ footer {
   color: var(--win);
 }
 
+/* ECDSA / Lattice analysis log */
+.analysis-log {
+  margin-top: 0.5rem;
+  background: var(--bg-field, #0a0a0a);
+  border: 1px solid var(--ink-dim);
+  border-radius: 4px;
+  padding: 0.5rem 0.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-dim);
+  max-height: 10rem;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.analysis-log .log-ok  { color: var(--win); }
+.analysis-log .log-err { color: #ff6060; }
+
 /* Live stats bar */
 .live-bar {
   padding: 0.35rem 0 0.6rem;

