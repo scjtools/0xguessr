@@ -227,6 +227,42 @@ footer {
 .radio-label input { accent-color: var(--accent); }
 
 
+/* Mode info stats row */
+.mode-stats {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.mode-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  padding: 0.35rem 0.65rem;
+  min-width: 0;
+}
+.mode-stat-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-dim);
+}
+.mode-stat-val {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--accent);
+}
+.mode-stat-val sup {
+  font-size: 0.6rem;
+}
+.radio-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
 /* Tab separator between random and exploit groups */
 .tab-sep {
   display: block;

@@ -127,6 +127,7 @@ async function main() {
 
   // Mode tabs
   const modeTabs   = document.querySelectorAll('.mode-tab');
+  const panelRandom    = document.getElementById('panel-random');
   const panelBip       = document.getElementById('panel-bip39');
   const panelPuzzle    = document.getElementById('panel-puzzle');
   const panelTimestamp = document.getElementById('panel-timestamp');
@@ -134,6 +135,7 @@ async function main() {
   const panelRandstorm = document.getElementById('panel-randstorm');
 
   const allPanels = {
+    random:    panelRandom,
     bip39:     panelBip,
     puzzle:    panelPuzzle,
     timestamp: panelTimestamp,
