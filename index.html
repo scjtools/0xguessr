@@ -29,6 +29,9 @@
           <span class="stat-sub" id="stat-snapshot">…</span>
         </div>
       </div>
+    <div class="live-bar" id="live-bar">
+      <span id="live-spins">0 spins</span><span id="live-rate" class="hidden"> · <span id="live-rate-val">0</span>/sec</span>
+    </div>
     </header>
 
     <main>
@@ -51,6 +54,9 @@
         <div class="controls">
           <button class="settings-btn" id="settings-btn" type="button" aria-label="Settings">
             <span aria-hidden="true">⚙</span> Settings
+          </button>
+          <button class="settings-btn share-btn" id="share-btn" type="button">
+            <span aria-hidden="true">↗</span> Share
           </button>
         </div>
       </section>
@@ -143,6 +149,19 @@
         Inspired by <a href="https://github.com/Pathos0925/SatoshiGuesser" target="_blank" rel="noopener">SatoshiGuesser</a>
       </small>
     </footer>
+
+    <dialog id="share-dialog" class="share-dialog">
+      <div class="share-content">
+        <canvas id="share-canvas" class="share-canvas"></canvas>
+        <div class="share-actions">
+          <button id="share-download" type="button">↓ Save image</button>
+          <button id="share-copy" type="button">⧉ Copy image</button>
+          <button id="share-close" type="button">Close</button>
+        </div>
+      </div>
+    </dialog>
+
+    <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="false"></div>
 
     <script type="module" src="/src/main.js"></script>
   </body>

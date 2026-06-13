@@ -173,6 +173,112 @@ footer {
 
 .hidden { display: none !important; }
 
+/* Live stats bar */
+.live-bar {
+  padding: 0.35rem 0 0.6rem;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--ink-dim);
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+#live-spins {
+  color: var(--win);
+  font-weight: 600;
+}
+#live-rate-val {
+  color: var(--accent-2);
+}
+
+/* Toast notifications */
+.toast-container {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+.toast {
+  background: var(--panel-2);
+  border: 1px solid var(--win);
+  color: var(--ink);
+  padding: 0.65rem 1rem;
+  border-radius: 0.4rem;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  max-width: 300px;
+  opacity: 0;
+  transform: translateY(0.5rem);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+}
+.toast--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Share button accent */
+.share-btn:hover {
+  border-color: var(--win) !important;
+}
+
+/* Share dialog */
+.share-dialog {
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  background: var(--panel-2);
+  color: var(--ink);
+  padding: 0;
+  max-width: min(760px, 94vw);
+}
+.share-dialog::backdrop {
+  background: rgba(5, 6, 10, 0.75);
+  backdrop-filter: blur(3px);
+}
+.share-content {
+  padding: 1.25rem;
+}
+.share-canvas {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+}
+.share-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.9rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+.share-actions button {
+  background: var(--panel);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.9rem;
+  border-radius: 0.4rem;
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.share-actions button:first-child {
+  background: var(--win);
+  color: #071a10;
+  border-color: transparent;
+  font-weight: 600;
+}
+.share-actions button:hover {
+  border-color: var(--accent);
+}
+.share-actions button:first-child:hover {
+  border-color: transparent;
+  opacity: 0.9;
+}
+
 /* Win dialog */
 .win-dialog {
   border: 1px solid var(--border);

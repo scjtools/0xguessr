@@ -10,9 +10,40 @@ import { ClassicReels } from './ui/slot-classic.js';
 import { RealisticReels } from './ui/slot-realistic.js';
 import { WinDialog } from './ui/win-dialog.js';
 import { sfx, setMuted, unlock } from './audio/audio.js';
+import { recordSpin, getStats, getTier, milestoneMessage } from './ui/stats.js';
+import { drawShareCard, downloadCard, copyCardToClipboard } from './ui/share-card.js';
 
 const AUTOSPIN_DELAY_MS = 250;
 const AUTOSPIN_DELAY_NO_DELAY_MS = 16;
+
+// Rolling window for spins/sec calculation
+const spinTimes = [];
+const RATE_WINDOW_MS = 3000;
+
+function recordSpinTime() {
+  const now = Date.now();
+  spinTimes.push(now);
+  while (spinTimes.length > 0 && spinTimes[0] < now - RATE_WINDOW_MS) spinTimes.shift();
+}
+
+function getSpinsPerSec() {
+  if (spinTimes.length < 2) return 0;
+  const elapsed = spinTimes[spinTimes.length - 1] - spinTimes[0];
+  return elapsed > 0 ? ((spinTimes.length - 1) / elapsed) * 1000 : 0;
+}
+
+function showToast(message) {
+  const container = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = message;
+  container.appendChild(el);
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('toast--visible')));
+  setTimeout(() => {
+    el.classList.remove('toast--visible');
+    setTimeout(() => el.remove(), 300);
+  }, 4500);
+}
 
 function fmtNumber(n) {
   return n.toLocaleString('en-US');
@@ -62,11 +93,27 @@ function shorten(s, n = 8) {
   return `${s.slice(0, n)}…${s.slice(-n)}`;
 }
 
+function updateLiveBar(isAutospinning) {
+  const { total = 0 } = getStats();
+  document.getElementById('live-spins').textContent =
+    `${total.toLocaleString('en-US')} spin${total === 1 ? '' : 's'}`;
+  const rateEl  = document.getElementById('live-rate');
+  const rateVal = document.getElementById('live-rate-val');
+  const rate = getSpinsPerSec();
+  if (isAutospinning && rate >= 1) {
+    rateVal.textContent = Math.round(rate);
+    rateEl.classList.remove('hidden');
+  } else {
+    rateEl.classList.add('hidden');
+  }
+}
+
 async function main() {
   const stats = await loadStats();
   loadBloom();
 
   renderHeaderStats(stats);
+  updateLiveBar(false);
 
   const log = new Log(document.getElementById('log'));
   log.append(
@@ -127,6 +174,35 @@ async function main() {
     }
   });
   settingsClose.addEventListener('click', () => settingsDialog.close());
+
+  // Share dialog
+  const shareBtn      = document.getElementById('share-btn');
+  const shareDialog   = document.getElementById('share-dialog');
+  const shareCanvas   = document.getElementById('share-canvas');
+  const shareDownload = document.getElementById('share-download');
+  const shareCopy     = document.getElementById('share-copy');
+  const shareClose    = document.getElementById('share-close');
+
+  shareBtn.addEventListener('click', () => {
+    const { total = 0 } = getStats();
+    drawShareCard(shareCanvas, total);
+    shareDialog.showModal();
+  });
+  shareDownload.addEventListener('click', () => {
+    const { total = 0 } = getStats();
+    downloadCard(shareCanvas, total);
+  });
+  shareCopy.addEventListener('click', async () => {
+    try {
+      await copyCardToClipboard(shareCanvas);
+      shareCopy.textContent = '✓ Copied!';
+      setTimeout(() => { shareCopy.textContent = '⧉ Copy image'; }, 2000);
+    } catch {
+      shareCopy.textContent = 'Copy failed';
+      setTimeout(() => { shareCopy.textContent = '⧉ Copy image'; }, 2000);
+    }
+  });
+  shareClose.addEventListener('click', () => shareDialog.close());
 
   function setManualResult(text, kind) {
     manualResult.textContent = text;
@@ -216,6 +292,11 @@ async function main() {
       const spinAnim = new Promise((r) => setTimeout(r, 1100));
       [, result] = await Promise.all([spinAnim, spin({ devWin: forced })]);
     }
+
+    recordSpinTime();
+    const { total, milestone } = recordSpin();
+    updateLiveBar(autospinToggle.checked);
+    if (milestone) showToast(milestoneMessage(milestone));
 
     log.append(
       `key=${shorten(result.privKeyHex, 6)} ` +
