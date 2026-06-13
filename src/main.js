@@ -15,6 +15,12 @@ import { drawShareCard, downloadCard, copyCardToClipboard } from './ui/share-car
 import {
   loadWordlist, getProgress, resetScan, getBip39AllWords, BUILTIN_PHRASES,
 } from './game/brain-wallet.js';
+import { resetProfanity, getProfanitySeed } from './game/profanity.js';
+import { resetPuzzle, getPuzzleCounter } from './game/puzzle.js';
+import {
+  resetTimestamp, getTimestampProgress, tsToDate, ETH_GENESIS_TS,
+} from './game/timestamp-scan.js';
+import { resetRandstorm, getRandstormSeed } from './game/randstorm.js';
 
 const AUTOSPIN_DELAY_MS = 250;
 const AUTOSPIN_DELAY_NO_DELAY_MS = 16;
@@ -124,14 +130,26 @@ async function main() {
 
   // Mode tabs
   const modeTabs   = document.querySelectorAll('.mode-tab');
-  const panelBip   = document.getElementById('panel-bip39');
-  const panelBrain = document.getElementById('panel-brain');
+  const panelBip       = document.getElementById('panel-bip39');
+  const panelBrain     = document.getElementById('panel-brain');
+  const panelPuzzle    = document.getElementById('panel-puzzle');
+  const panelTimestamp = document.getElementById('panel-timestamp');
+  const panelProfanity = document.getElementById('panel-profanity');
+  const panelRandstorm = document.getElementById('panel-randstorm');
+
+  const allPanels = {
+    bip39:     panelBip,
+    brain:     panelBrain,
+    puzzle:    panelPuzzle,
+    timestamp: panelTimestamp,
+    profanity: panelProfanity,
+    randstorm: panelRandstorm,
+  };
 
   function setMode(mode) {
     currentMode = mode;
     modeTabs.forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
-    panelBip.hidden   = mode !== 'bip39';
-    panelBrain.hidden = mode !== 'brain';
+    Object.entries(allPanels).forEach(([k, el]) => { el.hidden = k !== mode; });
   }
   modeTabs.forEach(t => t.addEventListener('click', () => setMode(t.dataset.mode)));
 
@@ -167,6 +185,47 @@ async function main() {
   document.getElementById('wordlist-paste').addEventListener('input', e => {
     const lines = e.target.value.split('\n');
     applyWordlist(lines, 'custom paste');
+  });
+
+  // Puzzle controls
+  document.getElementById('puzzle-set').addEventListener('click', () => {
+    const raw = document.getElementById('puzzle-start').value.trim();
+    if (!raw) return;
+    try {
+      const start = raw.startsWith('0x') || raw.startsWith('0X')
+        ? BigInt(raw)
+        : /^[0-9]+$/.test(raw) ? BigInt(raw) : BigInt('0x' + raw);
+      resetPuzzle(start);
+      document.getElementById('puzzle-status').textContent = `Key #${start.toLocaleString ? start : start}`;
+    } catch { /* invalid input */ }
+  });
+
+  // Timestamp controls
+  document.getElementById('ts-set').addEventListener('click', () => {
+    const val = document.getElementById('ts-start').value;
+    if (!val) return;
+    const ts = Math.floor(new Date(val).getTime() / 1000);
+    if (isNaN(ts)) return;
+    resetTimestamp(ts);
+    document.getElementById('ts-status').textContent = tsToDate(ts);
+  });
+
+  // Profanity controls
+  document.getElementById('profanity-set').addEventListener('click', () => {
+    const raw = parseInt(document.getElementById('profanity-start').value, 10);
+    const seed = isNaN(raw) ? 0 : Math.max(0, Math.min(raw, 0xFFFFFFFF));
+    resetProfanity(seed);
+    document.getElementById('profanity-status').textContent =
+      `Seed ${seed.toLocaleString('en-US')} / 4,294,967,295`;
+  });
+
+  // Randstorm controls
+  document.getElementById('randstorm-set').addEventListener('click', () => {
+    const raw = parseInt(document.getElementById('randstorm-start').value, 10);
+    const seed = isNaN(raw) ? 0 : Math.max(0, Math.min(raw, 0xFFFFFFFF));
+    resetRandstorm(seed);
+    document.getElementById('randstorm-status').textContent =
+      `Seed ${seed.toLocaleString('en-US')} / 4,294,967,295`;
   });
 
   document.getElementById('wordlist-load-url').addEventListener('click', async () => {
@@ -382,6 +441,24 @@ async function main() {
       logLine = `[${result.mnemonic}] addr=${shorten(result.derived.address, 6)}`;
     } else if (result.phrase != null) {
       logLine = `"${result.phrase}" → ${shorten(result.derived.address, 6)}`;
+    } else if (result.mode === 'profanity') {
+      const s = result.meta.seed;
+      document.getElementById('profanity-status').textContent =
+        `Seed ${s.toLocaleString('en-US')} / 4,294,967,295`;
+      logLine = `[profanity s=${s}] addr=${shorten(result.derived.address, 6)}`;
+    } else if (result.mode === 'puzzle') {
+      const idx = result.meta.index;
+      document.getElementById('puzzle-status').textContent = `Key #${idx}`;
+      logLine = `[key #${idx}] addr=${shorten(result.derived.address, 6)}`;
+    } else if (result.mode === 'timestamp') {
+      const d = tsToDate(result.meta.ts);
+      document.getElementById('ts-status').textContent = d;
+      logLine = `[${d}] addr=${shorten(result.derived.address, 6)}`;
+    } else if (result.mode === 'randstorm') {
+      const s = result.meta.seed;
+      document.getElementById('randstorm-status').textContent =
+        `Seed ${s.toLocaleString('en-US')} / 4,294,967,295`;
+      logLine = `[randstorm s=${s}] addr=${shorten(result.derived.address, 6)}`;
     } else {
       logLine = `key=${shorten(result.privKeyHex, 6)} addr=${shorten(result.derived.address, 6)}`;
     }

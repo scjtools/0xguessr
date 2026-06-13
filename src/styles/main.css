@@ -301,6 +301,63 @@ footer {
 .wordlist-status.loaded { color: var(--win); }
 .wordlist-status.error  { color: var(--lose); }
 
+/* Tab separator between random and exploit groups */
+.tab-sep {
+  display: block;
+  width: 1px;
+  background: var(--border);
+  margin: 0.25rem 0.25rem;
+  align-self: stretch;
+}
+
+/* Exploit mode panels — shared layout */
+.mode-desc {
+  margin: 0 0 0.3rem;
+  font-size: 0.8rem;
+  color: var(--ink-dim);
+  line-height: 1.45;
+}
+.scan-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.scan-label {
+  font-size: 0.75rem;
+  color: var(--ink-dim);
+  white-space: nowrap;
+}
+.scan-input {
+  flex: 1;
+  min-width: 140px;
+  background: var(--panel-2);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+  padding: 0.35rem 0.6rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+}
+.scan-input:focus { outline: none; border-color: var(--accent); }
+.scan-row button {
+  background: var(--panel-2);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.4rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.scan-row button:hover { border-color: var(--accent); color: var(--accent); }
+.scan-status {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--win);
+}
+
 /* Live stats bar */
 .live-bar {
   padding: 0.35rem 0 0.6rem;

@@ -39,6 +39,11 @@
         <button class="mode-tab active" data-mode="random" role="tab">Random</button>
         <button class="mode-tab" data-mode="bip39" role="tab">BIP39</button>
         <button class="mode-tab" data-mode="brain" role="tab">Brain Wallet</button>
+        <span class="tab-sep" aria-hidden="true"></span>
+        <button class="mode-tab" data-mode="puzzle" role="tab">Puzzle</button>
+        <button class="mode-tab" data-mode="timestamp" role="tab">Timestamp</button>
+        <button class="mode-tab" data-mode="profanity" role="tab">Profanity</button>
+        <button class="mode-tab" data-mode="randstorm" role="tab">Randstorm</button>
       </div>
 
       <div class="mode-panel" id="panel-bip39" hidden>
@@ -60,6 +65,46 @@
           <button id="wordlist-load-url" type="button">Fetch</button>
         </div>
         <p class="wordlist-status" id="wordlist-status">No list loaded.</p>
+      </div>
+
+      <div class="mode-panel" id="panel-puzzle" hidden>
+        <p class="mode-desc">Sequential private keys — 1, 2, 3 … in order. Very low keys were swept long ago; jump to any range you like.</p>
+        <div class="scan-row">
+          <label class="scan-label">Start key (hex or integer)</label>
+          <input type="text" id="puzzle-start" class="scan-input" spellcheck="false" placeholder="1" />
+          <button id="puzzle-set" type="button">Set</button>
+        </div>
+        <p class="scan-status" id="puzzle-status">Key #1</p>
+      </div>
+
+      <div class="mode-panel" id="panel-timestamp" hidden>
+        <p class="mode-desc">Tests sha256(unix_timestamp) for every second from Ethereum genesis (2015-07-30) onward. Catches wallets built with naive timestamp-seeded scripts.</p>
+        <div class="scan-row">
+          <label class="scan-label">Start date</label>
+          <input type="date" id="ts-start" class="scan-input" value="2015-07-30" />
+          <button id="ts-set" type="button">Set</button>
+        </div>
+        <p class="scan-status" id="ts-status">2015-07-30 00:00:00 UTC</p>
+      </div>
+
+      <div class="mode-panel" id="panel-profanity" hidden>
+        <p class="mode-desc">Profanity (2022 exploit) — the popular vanity address tool only used a 32-bit mt19937_64 seed. We iterate all 4 billion possible seeds.</p>
+        <div class="scan-row">
+          <label class="scan-label">Start seed (0 – 4294967295)</label>
+          <input type="number" id="profanity-start" class="scan-input" min="0" max="4294967295" placeholder="0" />
+          <button id="profanity-set" type="button">Set</button>
+        </div>
+        <p class="scan-status" id="profanity-status">Seed 0 / 4,294,967,295</p>
+      </div>
+
+      <div class="mode-panel" id="panel-randstorm" hidden>
+        <p class="mode-desc">Randstorm (2023 exploit) — BitcoinJS filled its RC4 entropy pool using Chrome's old Math.random() (MWC1616), seeded with only 32 bits. Affects wallets from 2011–2015.</p>
+        <div class="scan-row">
+          <label class="scan-label">Start seed (0 – 4294967295)</label>
+          <input type="number" id="randstorm-start" class="scan-input" min="0" max="4294967295" placeholder="0" />
+          <button id="randstorm-set" type="button">Set</button>
+        </div>
+        <p class="scan-status" id="randstorm-status">Seed 0 / 4,294,967,295</p>
       </div>
 
       <section class="machine">
