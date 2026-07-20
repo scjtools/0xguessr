@@ -52,6 +52,20 @@ jobs:
             "$(cat scripts/bq-query.sql)" > addrs.csv
           wc -l addrs.csv
 
+      - name: Refresh headline stats (ETH price + total supply held)
+        continue-on-error: true
+        run: |
+          price=$(curl -sf https://api.coinbase.com/v2/prices/ETH-USD/spot \
+            | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>process.stdout.write(String(JSON.parse(d).data.amount)))")
+          total=$(bq query \
+            --project_id="${{ vars.GCP_PROJECT_ID }}" \
+            --use_legacy_sql=false --format=csv --max_rows=1 \
+            "SELECT CAST(ROUND(SUM(eth_balance)/1e18) AS INT64) FROM \`bigquery-public-data.crypto_ethereum.balances\` WHERE eth_balance >= 1000000000000000000" \
+            | tail -1)
+          [ -n "$price" ] && echo "ETH_USD_APPROX=$price" >> "$GITHUB_ENV"
+          [ -n "$total" ] && echo "TOTAL_ETH_APPROX=$total" >> "$GITHUB_ENV"
+          echo "PRICE_SNAPSHOT_DATE=$(date -u +%F)" >> "$GITHUB_ENV"
+
       - name: Build bloom filter
         env:
           BLOOM_SOURCE: 'Google BigQuery crypto_ethereum.balances (>= 1 ETH)'
