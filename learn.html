@@ -16,6 +16,7 @@
     <link rel="manifest" href="/site.webmanifest" />
 
     <meta property="og:type" content="article" />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content="0xguessr" />
     <meta property="og:title" content="How Ethereum Private Keys Get Cracked" />
     <meta property="og:description" content="Seed phrases, keyspace math, and the real vulnerabilities that have drained crypto wallets — Randstorm, Milk Sad, Profanity, ECDSA nonce reuse, brain wallets — plus the quantum threat." />
@@ -38,6 +39,45 @@
         "author": { "@type": "Organization", "name": "0xguessr" },
         "publisher": { "@type": "Organization", "name": "0xguessr" },
         "mainEntityOfPage": "https://0xguessr.sanjaycj.com/learn"
+      }
+    </script>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Can you actually crack an Ethereum private key?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Not a properly-generated one. There are 2^256 (about 1.16 x 10^77) possible keys — more than the number of atoms in the observable universe — so no amount of computing power can brute-force them. Every real wallet theft instead exploited weak randomness or reused secrets, never the elliptic-curve cryptography itself." }
+          },
+          {
+            "@type": "Question",
+            "name": "Has anyone ever guessed someone's crypto wallet?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Yes, but never by luck. Wallets have been drained by exploiting broken random number generators (Randstorm, Milk Sad, Profanity), reused ECDSA nonces, and weak brain-wallet passphrases. In each case the key was recoverable because it was created or used insecurely." }
+          },
+          {
+            "@type": "Question",
+            "name": "How many Ethereum private keys are possible?",
+            "acceptedAnswer": { "@type": "Answer", "text": "2^256, which is approximately 1.16 x 10^77 — roughly on the order of the number of atoms in the observable universe." }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the Bitcoin Puzzle Transaction?",
+            "acceptedAnswer": { "@type": "Answer", "text": "A 2015 challenge in which an anonymous creator funded 256 addresses with private keys of deliberately increasing bit-length, as a public benchmark for key-search progress. Keys up to roughly #70 have been solved; the outstanding bounty is worth tens of millions of dollars." }
+          },
+          {
+            "@type": "Question",
+            "name": "Will quantum computers break Ethereum wallets?",
+            "acceptedAnswer": { "@type": "Answer", "text": "In theory. Shor's algorithm could derive a private key from an exposed public key. Addresses that have never sent a transaction only expose a hash and are better protected, while reused addresses are most at risk. NIST has standardised post-quantum signatures, and Ethereum is researching quantum-resistant migration." }
+          },
+          {
+            "@type": "Question",
+            "name": "Is 0xguessr real — can I actually win?",
+            "acceptedAnswer": { "@type": "Answer", "text": "The mechanism is 100% real: each spin generates a genuine key and checks it against funded addresses, confirming any hit on-chain before showing a win. But the odds are about 1 in 7.9 x 10^70 per spin, so a real win will never happen. It is an educational demonstration, not a way to make money." }
+          }
+        ]
       }
     </script>
 
@@ -66,6 +106,7 @@
           <li><a href="#cracked">How wallets actually get drained</a></li>
           <li><a href="#projects">Live key-cracking projects to watch</a></li>
           <li><a href="#quantum">Emerging threats: quantum &amp; beyond</a></li>
+          <li><a href="#faq">Frequently asked questions</a></li>
         </ol>
       </div>
 
@@ -302,6 +343,26 @@
         <li><b>"Harvest now, decrypt later":</b> adversaries can archive today's exposed public keys and wait for hardware to catch up. Estimates for a cryptographically-relevant quantum computer range from a decade to never, but the risk is why the field is moving now.</li>
         <li><b>The response:</b> NIST has standardised post-quantum signature schemes, and Ethereum's roadmap (account abstraction, and research into quantum-resistant signatures) aims to let accounts migrate to new cryptography without abandoning their funds.</li>
       </ul>
+
+      <h2 class="section" id="faq">Frequently asked questions</h2>
+
+      <h3>Can you actually crack an Ethereum private key?</h3>
+      <p>Not a properly-generated one. There are 2<sup>256</sup> (about 1.16 × 10<sup>77</sup>) possible keys — more than the number of atoms in the observable universe — so no amount of computing power can brute-force them. Every real wallet theft instead exploited weak randomness or reused secrets, never the elliptic-curve cryptography itself.</p>
+
+      <h3>Has anyone ever guessed someone's crypto wallet?</h3>
+      <p>Yes, but never by luck. Wallets have been drained by exploiting broken random number generators (Randstorm, Milk Sad, Profanity), reused ECDSA nonces, and weak brain-wallet passphrases. In each case the key was recoverable because it was created or used insecurely.</p>
+
+      <h3>How many Ethereum private keys are possible?</h3>
+      <p>2<sup>256</sup>, which is approximately 1.16 × 10<sup>77</sup> — roughly on the order of the number of atoms in the observable universe.</p>
+
+      <h3>What is the Bitcoin Puzzle Transaction?</h3>
+      <p>A 2015 challenge in which an anonymous creator funded 256 addresses with private keys of deliberately increasing bit-length, as a public benchmark for key-search progress. Keys up to roughly #70 have been solved; the outstanding bounty is worth tens of millions of dollars.</p>
+
+      <h3>Will quantum computers break Ethereum wallets?</h3>
+      <p>In theory. Shor's algorithm could derive a private key from an exposed public key. Addresses that have never sent a transaction only expose a hash and are better protected, while reused addresses are most at risk. NIST has standardised post-quantum signatures, and Ethereum is researching quantum-resistant migration.</p>
+
+      <h3>Is 0xguessr real — can I actually win?</h3>
+      <p>The mechanism is 100% real: each spin generates a genuine key and checks it against funded addresses, confirming any hit on-chain before showing a win. But the odds are about 1 in 7.9 × 10<sup>70</sup> per spin, so a real win will never happen. It is an educational demonstration, not a way to make money.</p>
 
       <div class="callout win">
         <b>The honest bottom line.</b> No one has ever cracked a properly-generated

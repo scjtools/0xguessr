@@ -1,3 +1,7 @@
+# 0xguessr — https://0xguessr.sanjaycj.com
+# Educational, fully public content. Search crawlers and AI agents welcome.
+# LLM-friendly overview: https://0xguessr.sanjaycj.com/llms.txt
+
 User-agent: *
 Allow: /
 

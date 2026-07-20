@@ -1,0 +1,19 @@
+# 0xguessr
+
+> A free, educational browser game — a "slot machine" that generates random Ethereum private keys and checks whether any controls a funded wallet. It makes the scale of cryptographic keyspaces (2^256) viscerally clear and teaches how real crypto wallets have actually been compromised.
+
+Every spin runs 100% client-side: a random 256-bit key is generated with the Web Crypto API, the Ethereum address is derived (secp256k1 → Keccak-256), and checked against a weekly-refreshed Bloom filter of ~1.5 million addresses holding at least 1 ETH. A bloom hit is confirmed with a live on-chain `eth_getBalance` before any "win" is shown, so the game never reports a false win. The odds of a genuine win are about 1 in 7.9 × 10^70 per spin — mathematically non-zero, practically impossible. No private key ever leaves the browser.
+
+Beyond the "Random" mode, the game replays real historical vulnerabilities against Ethereum key derivation, each linked to an in-depth explainer.
+
+## Pages
+
+- [Home — the game](https://0xguessr.sanjaycj.com/): The slot machine with 10 attack-vector modes: Random, BIP39, Puzzle, Timestamp, Profanity, Randstorm, Libbitcoin, Cross-chain, ECDSA nonce reuse, and Lattice.
+- [Learn — How Ethereum Private Keys Get Cracked](https://0xguessr.sanjaycj.com/learn): Long-form guide on how private keys and BIP39 seed phrases work, why brute force is impossible, and every real-world wallet compromise — Randstorm (BitcoinJS), Milk Sad (CVE-2023-39910), Profanity / the $160M Wintermute hack, ECDSA nonce reuse, lattice attacks, and brain wallets — plus live key-cracking projects (the Bitcoin Puzzle Transaction) and the quantum-computing threat to ECDSA.
+
+## Key facts
+
+- Keyspace: 2^256 ≈ 1.16 × 10^77 possible Ethereum private keys.
+- No properly-generated key has ever been guessed. Every real theft exploited weak randomness or reused secrets — never the elliptic-curve cryptography itself.
+- The wallet dataset is sourced weekly from Google BigQuery (addresses ≥ 1 ETH).
+- Fully open source: https://github.com/scjtools/0xguessr
