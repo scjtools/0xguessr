@@ -14,9 +14,9 @@ const PUB = resolve(ROOT, 'public');
 
 let jackpot = '192';
 try {
-  jackpot = String(
-    jackpotBillions(JSON.parse(readFileSync(resolve(PUB, 'data/eth_meta.json'), 'utf8')))
-  );
+  jackpot = jackpotBillions(
+    JSON.parse(readFileSync(resolve(PUB, 'data/eth_meta.json'), 'utf8'))
+  ).toLocaleString('en-US');
 } catch { /* keep fallback */ }
 
 function render(svgName, outName, width) {

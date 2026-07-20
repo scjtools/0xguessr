@@ -20,7 +20,7 @@ function jackpotHtmlPlugin() {
         );
         billions = jackpotBillions(meta) || billions;
       } catch { /* keep fallback */ }
-      return html.replaceAll('__JACKPOT_B__', String(billions));
+      return html.replaceAll('__JACKPOT_B__', billions.toLocaleString('en-US'));
     },
   };
 }

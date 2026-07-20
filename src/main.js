@@ -104,7 +104,7 @@ function renderHeaderStats(stats) {
     'about 10⁷× harder than picking one specific atom in the universe';
   document.getElementById('stat-wallet-count').textContent = fmtNumber(stats.address_count);
   document.getElementById('stat-snapshot').textContent =
-    `price snapshot: ${stats.price_snapshot_date ?? '—'}`;
+    `snapshot: ${stats.price_snapshot_date ?? '—'}`;
 }
 
 function shorten(s, n = 8) {
