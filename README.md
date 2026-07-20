@@ -123,7 +123,7 @@ node scripts/bench-spin.js  # spin throughput benchmark
 { "buildCommand": "npm run build", "outputDirectory": "dist" }
 ```
 
-Import `scjtools/0xguessr` in the Vercel dashboard — no further config needed.
+Import `scjtools/0xguessr` in the Vercel dashboard. Custom domain `0xguessr.sanjaycj.com` is configured via DNS CNAME to Vercel.
 
 ---
 
