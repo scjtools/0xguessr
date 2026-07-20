@@ -45,3 +45,12 @@ export function parsePrivKey(input) {
   }
   throw new Error('Unrecognised key format. Expected 64 hex characters.');
 }
+
+// Format a wei balance (bigint) as an ETH string, e.g. "3.42 ETH".
+// null/undefined → generic "≥1 ETH" label (used for dev-forced wins).
+export function fmtEth(wei) {
+  if (wei == null) return '≥1 ETH';
+  const eth = Number(wei) / 1e18;
+  const dp = eth >= 1000 ? 0 : eth >= 1 ? 2 : 4;
+  return `${eth.toLocaleString('en-US', { maximumFractionDigits: dp })} ETH`;
+}

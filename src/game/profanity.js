@@ -53,8 +53,6 @@ function mt64Key(seed32) {
 let _seed = 0;
 
 export function resetProfanity(startSeed = 0) { _seed = startSeed >>> 0; }
-export function getProfanitySeed() { return _seed; }
-export function profanityTotal() { return 0x100000000; }
 
 export function nextProfanityKey() {
   if (_seed >= 0x100000000) return { key: null, seed: _seed, exhausted: true };

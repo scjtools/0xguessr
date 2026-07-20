@@ -60,8 +60,6 @@ function seedToKey(seed32) {
 let _seed = 0;
 
 export function resetRandstorm(startSeed = 0) { _seed = startSeed >>> 0; }
-export function getRandstormSeed() { return _seed; }
-export function randstormTotal() { return 0x100000000; }
 
 export function nextRandstormKey() {
   if (_seed >= 0x100000000) return { key: null, seed: _seed, exhausted: true };
