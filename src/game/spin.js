@@ -1,5 +1,5 @@
 import { deriveAll, randomPrivKey, bytesToHex } from './crypto.js';
-import { checkAddress } from './wallets.js';
+import { checkAddress, confirmFunded } from './wallets.js';
 import { randomMnemonic, mnemonicToPrivKey } from './bip39-derive.js';
 import { nextProfanityKey } from './profanity.js';
 import { nextPuzzleKey } from './puzzle.js';
@@ -12,6 +12,8 @@ export async function spin({ devWin = null, mode = 'random', bipWords = 12 } = {
   if (devWin) {
     return {
       win: true,
+      candidate: true,
+      balanceWei: null, // dev-forced win; no real balance
       privKey: devWin.privKey,
       privKeyHex: bytesToHex(devWin.privKey),
       derived: deriveAll(devWin.privKey),
@@ -67,14 +69,31 @@ export async function spin({ devWin = null, mode = 'random', bipWords = 12 } = {
   }
 
   const derived = deriveAll(privKey);
-  const hit     = await checkAddress(derived.addressBytes);
+
+  // Bloom is only a pre-filter — a hit is a *candidate*, never a win on its own.
+  // Confirm the real balance on-chain before declaring anything.
+  const candidate = await checkAddress(derived.addressBytes);
+  let win = false;
+  let balanceWei = null;
+  if (candidate) {
+    try {
+      const conf = await confirmFunded(derived.address);
+      win = conf.funded;
+      balanceWei = conf.balanceWei;
+    } catch {
+      // RPC unreachable: cannot confirm, so cannot claim a win. Treat as no-win.
+      win = false;
+    }
+  }
 
   return {
-    win: hit !== null,
+    win,
+    candidate: candidate !== null, // bloom hit (may be a false positive)
+    balanceWei,                    // confirmed on-chain balance (bigint) or null
     privKey,
     privKeyHex: bytesToHex(privKey),
     derived,
-    match: hit,
+    match: candidate,
     mnemonic,
     meta,
     mode,

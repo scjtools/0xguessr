@@ -1,5 +1,5 @@
 import { spin } from './game/spin.js';
-import { loadStats, loadBloom, checkAddress } from './game/wallets.js';
+import { loadStats, loadBloom, checkAddress, confirmFunded } from './game/wallets.js';
 import {
   randomPrivKey,
   deriveAll,
@@ -64,6 +64,14 @@ function fmtNumber(n) {
   return n.toLocaleString('en-US');
 }
 
+// Format a wei balance (bigint) as an ETH string, e.g. "3.42 ETH".
+function fmtEth(wei) {
+  if (wei == null) return '≥1 ETH';
+  const eth = Number(wei) / 1e18;
+  const dp = eth >= 1000 ? 0 : eth >= 1 ? 2 : 4;
+  return `${eth.toLocaleString('en-US', { maximumFractionDigits: dp })} ETH`;
+}
+
 function fmtUsdShort(usd) {
   if (usd >= 1e12) return `$${(usd / 1e12).toFixed(2)}T`;
   if (usd >= 1e9)  return `$${(usd / 1e9).toFixed(2)}B`;
@@ -91,7 +99,7 @@ function renderHeaderStats(stats) {
   const totalEth = stats.total_eth_approx;
   const totalUsd = totalEth * stats.eth_usd_approx;
   document.getElementById('tagline').textContent = fmtTagline(totalUsd);
-  document.getElementById('stat-jackpot-btc').textContent =
+  document.getElementById('stat-jackpot-eth').textContent =
     `≈${fmtNumber(Math.round(totalEth))} ETH`;
   document.getElementById('stat-jackpot-usd').textContent =
     `≈ ${fmtUsdShort(totalUsd)}`;
@@ -519,16 +527,23 @@ async function main() {
     setManualResult('Checking…', null);
     try {
       const derived = deriveAll(parsed.privKey);
-      const hit = await checkAddress(derived.addressBytes);
-      log.append(
-        `manual: addr=${shorten(derived.address, 6)} → ${hit ? 'MATCH' : 'no match'}`
-      );
-      if (hit) {
-        setManualResult('🎉 Match! Opening prize dialog…', 'ok');
-        settingsDialog.close();
-        winDialog.show({ privKey: parsed.privKey, derived, match: hit });
-      } else {
+      const candidate = await checkAddress(derived.addressBytes);
+      if (!candidate) {
+        log.append(`manual: addr=${shorten(derived.address, 6)} → no match`);
         setManualResult(`No match. Address: ${derived.address}`, 'fail');
+        return;
+      }
+      // Bloom hit — confirm on-chain before claiming anything.
+      setManualResult('Bloom hit — verifying on-chain balance…', null);
+      const conf = await confirmFunded(derived.address);
+      if (conf.funded) {
+        log.append(`manual: addr=${shorten(derived.address, 6)} → CONFIRMED (${fmtEth(conf.balanceWei)})`);
+        setManualResult('🎉 Confirmed! Opening prize dialog…', 'ok');
+        settingsDialog.close();
+        winDialog.show({ privKey: parsed.privKey, derived, balanceWei: conf.balanceWei, match: candidate });
+      } else {
+        log.append(`manual: addr=${shorten(derived.address, 6)} → bloom false positive (holds ${fmtEth(conf.balanceWei)})`);
+        setManualResult(`Bloom hit, but this address holds ${fmtEth(conf.balanceWei)} (< 1 ETH) — not a win.`, 'fail');
       }
     } catch (err) {
       setManualResult(`Error: ${err.message}`, 'err');
@@ -656,10 +671,14 @@ async function main() {
       const winLabel = result.mnemonic
         ? `BIP39: [${result.mnemonic}]`
         : `key: ${result.privKeyHex}`;
-      log.append(`🎉 MATCH: ${result.derived.address} (≥1 ETH) — ${winLabel}`);
+      log.append(`🎉 MATCH: ${result.derived.address} (${fmtEth(result.balanceWei)}) — ${winLabel}`);
       sfx.win();
       if (autospinToggle.checked) autospinToggle.checked = false;
       winDialog.show(result);
+    } else if (result.candidate) {
+      // Bloom fired but the live balance check did not confirm >= 1 ETH.
+      log.append('→ bloom hit unconfirmed on-chain — false positive, no win');
+      sfx.lose();
     } else {
       log.append('→ no match');
       sfx.lose();

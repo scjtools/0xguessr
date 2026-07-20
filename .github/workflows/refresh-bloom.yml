@@ -1,0 +1,89 @@
+name: Refresh ETH bloom
+
+# Rebuilds public/data/eth_bloom.bin + eth_meta.json every week from a fresh
+# BigQuery pull of all addresses holding >= 1 ETH, then commits the result.
+#
+# Setup (one-time):
+#   Settings > Secrets and variables > Actions
+#     Secret   GCP_SA_KEY      — JSON key of a GCP service account with the
+#                                "BigQuery Job User" role (billing project below)
+#     Variable GCP_PROJECT_ID  — the GCP project id used to bill the query
+#   Settings > Actions > General > Workflow permissions > Read and write
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'   # 06:00 UTC every Monday
+  workflow_dispatch:       # allow manual runs from the Actions tab
+
+permissions:
+  contents: write          # to commit the refreshed files
+
+concurrency:
+  group: refresh-bloom
+  cancel-in-progress: false
+
+env:
+  MIN_ADDRESSES: 500000    # safety floor — refuse to publish a suspiciously small set
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Fetch addresses from BigQuery
+        run: |
+          bq query \
+            --project_id="${{ vars.GCP_PROJECT_ID }}" \
+            --use_legacy_sql=false \
+            --format=csv \
+            --max_rows=5000000 \
+            "$(cat scripts/bq-query.sql)" > addrs.csv
+          wc -l addrs.csv
+
+      - name: Build bloom filter
+        env:
+          BLOOM_SOURCE: 'Google BigQuery crypto_ethereum.balances (>= 1 ETH)'
+        run: node scripts/build-bloom.mjs addrs.csv
+
+      - name: Sanity-check the result
+        run: |
+          count=$(node -e "console.log(require('./public/data/eth_meta.json').address_count)")
+          echo "address_count=$count (floor=$MIN_ADDRESSES)"
+          if [ "$count" -lt "$MIN_ADDRESSES" ]; then
+            echo "::error::address_count $count below floor $MIN_ADDRESSES — not committing"
+            exit 1
+          fi
+
+      - name: Commit if changed
+        run: |
+          rm -f addrs.csv
+          if git diff --quiet -- public/data/eth_bloom.bin public/data/eth_meta.json; then
+            echo "No change in bloom — nothing to commit."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data/eth_bloom.bin public/data/eth_meta.json
+          count=$(node -e "console.log(require('./public/data/eth_meta.json').address_count)")
+          git commit -m "chore: refresh ETH bloom ($count addresses)"
+          git push
+
+      - name: Purge jsDelivr CDN cache
+        if: success()
+        continue-on-error: true
+        run: |
+          # Force jsDelivr to refetch the new files from GitHub immediately.
+          curl -sf "https://purge.jsdelivr.net/gh/scjtools/0xguessr@main/public/data/eth_bloom.bin" || true
+          curl -sf "https://purge.jsdelivr.net/gh/scjtools/0xguessr@main/public/data/eth_meta.json" || true

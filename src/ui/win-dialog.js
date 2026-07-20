@@ -8,7 +8,7 @@ export class WinDialog {
       dialog.close();
     });
     dialog.querySelector('#win-copy').addEventListener('click', async () => {
-      const key = dialog.querySelector('#win-wif').textContent;
+      const key = dialog.querySelector('#win-privkey').textContent;
       try {
         await navigator.clipboard.writeText(key);
         const btn = dialog.querySelector('#win-copy');
@@ -21,10 +21,10 @@ export class WinDialog {
     });
   }
 
-  show({ privKey, derived }) {
+  show({ privKey, derived, balanceWei = null }) {
     this.dialog.querySelector('#win-address').textContent = derived.address;
-    this.dialog.querySelector('#win-wif').textContent = bytesToHex(privKey);
-    this.dialog.querySelector('#win-btc').textContent = '≥1 ETH';
+    this.dialog.querySelector('#win-privkey').textContent = bytesToHex(privKey);
+    this.dialog.querySelector('#win-amount').textContent = fmtEth(balanceWei);
     this.dialog.querySelector('#win-usd').textContent = '';
 
     if (typeof this.dialog.showModal === 'function') {
@@ -35,6 +35,14 @@ export class WinDialog {
 
     fireConfetti();
   }
+}
+
+// Confirmed on-chain balance (bigint wei) → "3.42 ETH". Null → generic label.
+function fmtEth(wei) {
+  if (wei == null) return '≥1 ETH';
+  const eth = Number(wei) / 1e18;
+  const dp = eth >= 1000 ? 0 : eth >= 1 ? 2 : 4;
+  return `${eth.toLocaleString('en-US', { maximumFractionDigits: dp })} ETH`;
 }
 
 function fireConfetti() {
