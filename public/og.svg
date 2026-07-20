@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <radialGradient id="bg" cx="24%" cy="42%" r="80%">
+      <stop offset="0%" stop-color="#191c28"/>
+      <stop offset="100%" stop-color="#0d0e12"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2bd47d" stop-opacity="0.26"/>
+      <stop offset="100%" stop-color="#2bd47d" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="1" y="1" width="1198" height="628" fill="none" stroke="#2a2e3d" stroke-width="2"/>
+
+  <!-- ETH coin, left -->
+  <circle cx="210" cy="315" r="185" fill="url(#glow)"/>
+  <circle cx="210" cy="315" r="125" fill="#15171f" stroke="#2bd47d" stroke-width="4"/>
+  <g transform="translate(153 223) scale(0.44)">
+    <path fill="#fff" fill-opacity="0.6" d="M127.96 0l-2.8 9.5v275.67l2.8 2.79 127.96-75.64z"/>
+    <path fill="#fff" d="M127.96 0L0 212.32l127.96 75.64V154.16z"/>
+    <path fill="#fff" fill-opacity="0.6" d="M127.96 312.19l-1.58 1.92v98.2l1.58 4.6L256 236.59z"/>
+    <path fill="#fff" d="M127.96 416.91V312.19L0 236.59z"/>
+    <path fill="#fff" fill-opacity="0.2" d="M127.96 287.96l127.96-75.64-127.96-58.16z"/>
+    <path fill="#fff" fill-opacity="0.6" d="M0 212.32l127.96 75.64V154.16z"/>
+  </g>
+
+  <!-- Text block, right -->
+  <text x="382" y="248" font-family="Menlo, monospace" font-size="94" font-weight="700" fill="#e6e7eb">0xguessr</text>
+  <text x="384" y="344" font-family="Helvetica, Arial, sans-serif" font-size="54" font-weight="700" fill="#2bd47d">Win up to $192 billion</text>
+  <text x="384" y="416" font-family="Helvetica, Arial, sans-serif" font-size="27" fill="#b9bdca">A slot machine that guesses Ethereum private keys.</text>
+  <text x="384" y="458" font-family="Helvetica, Arial, sans-serif" font-size="27" fill="#8d92a3">Astronomically unlikely. Mathematically non-zero.</text>
+</svg>
