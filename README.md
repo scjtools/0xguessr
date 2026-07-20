@@ -7,12 +7,16 @@
 
 A slot-machine web game that "guesses" Ethereum private keys. Every pull
 generates a cryptographically random 256-bit number, derives the Ethereum
-address, and checks it against a bloom filter of **1,471,278 funded ETH
-addresses** (≥ 1 ETH each, sourced from Google BigQuery). If the derived
-address ever matches, the number you rolled *is* the working private key — no
-server, no API, no catch. The odds are ~1 in 7.87 × 10⁷⁰ per spin.
+address, and checks it against a bloom filter of **~1.47 M funded ETH
+addresses** (≥ 1 ETH each, refreshed weekly from Google BigQuery). The bloom is
+only a pre-filter: on a hit, the game confirms the address's **live on-chain
+balance** via a public RPC before ever showing a win — so a win is always real,
+never a false positive. If it confirms, the number you rolled *is* the working
+private key. The odds are ~1 in 7.87 × 10⁷⁰ per spin.
 
-Everything runs 100% client-side. No keys leave your browser.
+Key generation and derivation run 100% client-side; no keys leave your browser.
+The only network calls are fetching the bloom and, on a hit, a read-only
+`eth_getBalance`.
 
 ---
 
@@ -36,8 +40,8 @@ The following components are **entirely the work of SatoshiGuesser** and are use
 **What this fork changed:**
 
 - Crypto derivation: Bitcoin (secp256k1 → HASH160 → P2PKH → Base58) → Ethereum (secp256k1 uncompressed → keccak256 → last 20 bytes → 0x hex)
-- Wallet database: Patoshi Bitcoin addresses → 1.47 M funded ETH addresses from BigQuery
-- Bloom-only check (no sorted balance table — ETH bloom stores existence, not amount)
+- Wallet database: Patoshi Bitcoin addresses → ~1.47 M funded ETH addresses, refreshed weekly from Google BigQuery
+- Bloom pre-filter + live on-chain `eth_getBalance` confirmation (a shown win is always real, never a bloom false positive)
 - UI copy: title, tagline, stat labels, win dialog text, footer
 - Deployment target: Vercel instead of Cloudflare Workers
 
@@ -60,10 +64,35 @@ The following components are **entirely the work of SatoshiGuesser** and are use
 | `public/data/eth_bloom.bin` | Bloom filter — 1,471,278 ETH addresses, m=42,306,856 bits, k=20, p≈10⁻⁶ |
 | `public/data/eth_meta.json` | Snapshot metadata (address count, ETH/USD price, snapshot date) |
 
-Sourced from `bigquery-public-data.crypto_ethereum.balances` with filter
-`eth_balance >= 1000000000000000000` (≥ 1 ETH). Snapshot: 2026-06-13.
+Sourced from all addresses holding `>= 1 ETH`. Bloom binary format — `BLM\x01`:
+4-byte magic + uint32 m + uint32 k + uint32 n + bit array.
 
-Bloom binary format — `BLM\x01`: 4-byte magic + uint32 m + uint32 k + uint32 n + bit array.
+### Weekly auto-refresh
+
+`.github/workflows/refresh-bloom.yml` rebuilds these two files every Monday
+(06:00 UTC) from a fresh BigQuery pull of every address holding `>= 1 ETH`. It
+can also be run manually from the **Actions** tab.
+
+Pipeline: `bq query` on `bigquery-public-data.crypto_ethereum.balances`
+([scripts/bq-query.sql](scripts/bq-query.sql)) → `scripts/build-bloom.mjs`
+(builds the `BLM\x01` bloom, byte-compatible with `src/game/bloom.js`) → commit
+to `main` → purge jsDelivr. A safety floor (`MIN_ADDRESSES`) blocks publishing a
+suspiciously small set.
+
+**One-time setup** — a GCP service account with the *BigQuery Job User* role:
+
+| Where | Name | Value |
+|-------|------|-------|
+| Secrets → Actions | `GCP_SA_KEY` | the service account's JSON key (whole file) |
+| Variables → Actions | `GCP_PROJECT_ID` | GCP project id used to bill the query |
+| Settings → Actions → General | Workflow permissions | **Read and write** |
+
+To rebuild locally: run [scripts/bq-query.sql](scripts/bq-query.sql) in the
+BigQuery console, export the results as CSV, then
+`node scripts/build-bloom.mjs results.csv`.
+
+> Note: the client loads the bloom via jsDelivr (`@main`), which caches for a
+> while — expect up to ~12 h before a refreshed filter is live for all users.
 
 ---
 

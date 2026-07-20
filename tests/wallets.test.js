@@ -7,11 +7,11 @@ import { fileURLToPath } from 'node:url';
 import { BloomFilter } from '../src/game/bloom.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const BLOOM_PATH = resolve(ROOT, 'public/data/eth-bloom.bin');
+const BLOOM_PATH = resolve(ROOT, 'public/data/eth_bloom.bin');
 
 function skipIfNoBloom(t) {
   if (!existsSync(BLOOM_PATH)) {
-    t.skip('eth-bloom.bin not yet placed in public/data/');
+    t.skip('eth_bloom.bin not yet placed in public/data/');
     return true;
   }
   return false;

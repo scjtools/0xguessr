@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { deriveAll, hexToBytes, bytesToHex } from '../src/game/crypto.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const BLOOM_PATH = resolve(ROOT, 'public/data/eth-bloom.bin');
+const BLOOM_PATH = resolve(ROOT, 'public/data/eth_bloom.bin');
 
 test('derive pipeline produces valid ETH address from known privkey', () => {
   const priv = hexToBytes(
@@ -22,7 +22,7 @@ test('derive pipeline produces valid ETH address from known privkey', () => {
 
 test('miss: random key does not match eth-bloom (skipped if file absent)', async (t) => {
   if (!existsSync(BLOOM_PATH)) {
-    t.skip('eth-bloom.bin not yet placed in public/data/');
+    t.skip('eth_bloom.bin not yet placed in public/data/');
     return;
   }
   // Dynamically import to avoid top-level fetch usage in Node.
