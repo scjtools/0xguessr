@@ -52,13 +52,10 @@
   <body>
     <nav class="topnav">
       <a class="nav-brand" href="/">0xguessr</a>
-      <div class="nav-links">
-        <a class="nav-learn" href="/learn">
-          <span class="nav-full">How keys get cracked&nbsp;→</span>
-          <span class="nav-short">Learn&nbsp;→</span>
-        </a>
-        <a class="nav-ghost" href="https://github.com/scjtools/0xguessr" target="_blank" rel="noopener">GitHub</a>
-      </div>
+      <a class="nav-learn" href="/learn">
+        <span class="nav-full">Learn how keys get cracked&nbsp;→</span>
+        <span class="nav-short">Learn&nbsp;→</span>
+      </a>
     </nav>
     <header class="topbar">
       <h1 class="tagline" id="tagline">Win big guessing Ethereum private keys</h1>
@@ -79,9 +76,6 @@
           <span class="stat-sub" id="stat-snapshot">…</span>
         </div>
       </div>
-    <div class="live-bar" id="live-bar">
-      <span id="live-spins">0 spins</span><span id="live-rate" class="hidden"> · <span id="live-rate-val">0</span>/sec</span>
-    </div>
     </header>
 
     <main>
@@ -266,6 +260,8 @@
         <div id="lattice-log" class="analysis-log" hidden></div>
       </div>
 
+      <a id="mode-learn" class="panel-learn" href="/learn#impossible">📖 Read the full breakdown of this attack →</a>
+
       <section class="machine">
         <div class="machine-frame">
           <div class="reels" id="reels-classic" data-mode="classic">
@@ -282,13 +278,22 @@
           </button>
         </div>
 
-        <div class="controls">
-          <button class="settings-btn" id="settings-btn" type="button" aria-label="Settings">
-            <span aria-hidden="true">⚙</span> Settings
-          </button>
-          <button class="settings-btn share-btn" id="share-btn" type="button">
-            <span aria-hidden="true">↗</span> Share
-          </button>
+        <div class="tracker">
+          <p class="tracker-cta">Do you feel lucky, punk?</p>
+          <div class="tracker-row">
+            <span class="tracker-live">
+              <span class="live-dot" aria-hidden="true"></span>
+              <b id="live-spins">0 spins</b><span id="live-rate" class="hidden"> · <span id="live-rate-val">0</span>/sec</span>
+            </span>
+            <span class="tracker-buttons">
+              <button class="settings-btn" id="settings-btn" type="button" aria-label="Settings">
+                <span aria-hidden="true">⚙</span> Settings
+              </button>
+              <button class="settings-btn share-btn" id="share-btn" type="button">
+                <span aria-hidden="true">↗</span> Share
+              </button>
+            </span>
+          </div>
         </div>
       </section>
 
@@ -373,16 +378,9 @@
 
     <footer>
       <small>
-        <a href="/learn">📖 How Ethereum keys get cracked — the full breakdown</a>
-      </small>
-      <small>
-        100% client-side. Guesses are real, the odds are just real bad.
-      </small>
-      <small>
-        https://github.com/scjtools/0xguessr
-      </small>
-      <small>
-        Inspired by <a href="https://github.com/Pathos0925/SatoshiGuesser" target="_blank" rel="noopener">SatoshiGuesser</a>
+        100% client-side. Guesses are real, the odds are just really bad.
+        Inspired by <a href="https://github.com/Pathos0925/SatoshiGuesser" target="_blank" rel="noopener">SatoshiGuesser</a>.
+        <a href="https://github.com/scjtools/0xguessr" target="_blank" rel="noopener">View on GitHub</a>.
       </small>
     </footer>
 

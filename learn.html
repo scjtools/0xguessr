@@ -129,7 +129,7 @@
 
       <h3>Weak random number generators</h3>
 
-      <div class="case">
+      <div class="case" id="randstorm">
         <h4>Randstorm — BitcoinJS, 2011–2015</h4>
         <div class="meta">
           <span><b>Disclosed:</b> Nov 2023, Unciphered</span>
@@ -149,7 +149,7 @@
         <span class="try">▶ Try it: Randstorm mode replays the MWC1616 → RC4 pipeline across all 2³² seeds.</span>
       </div>
 
-      <div class="case">
+      <div class="case" id="milksad">
         <h4>Milk Sad — Libbitcoin Explorer, CVE-2023-39910</h4>
         <div class="meta">
           <span><b>Exploited:</b> Jun–Jul 2023</span>
@@ -168,7 +168,7 @@
         <span class="try">▶ Try it: Libbitcoin mode reproduces the exact MT19937 seed pipeline.</span>
       </div>
 
-      <div class="case">
+      <div class="case" id="profanity">
         <h4>Profanity — vanity address generator (the Wintermute hack)</h4>
         <div class="meta">
           <span><b>Disclosed:</b> Sep 2022, 1inch</span>
@@ -189,7 +189,7 @@
         <span class="try">▶ Try it: Profanity mode iterates all 2³² seeds through the same generator.</span>
       </div>
 
-      <h3>Reused numbers: ECDSA nonce reuse</h3>
+      <h3 id="ecdsa">Reused numbers: ECDSA nonce reuse</h3>
       <p>
         Every ECDSA signature uses a one-time random number called a <b>nonce</b>
         (<code>k</code>). If a wallet ever signs two different transactions with the
@@ -223,7 +223,7 @@
         <span class="try">▶ Try it: ECDSA Reuse mode fetches an address's transactions and checks for repeated r values.</span>
       </div>
 
-      <h3>Biased nonces: lattice attacks</h3>
+      <h3 id="lattice">Biased nonces: lattice attacks</h3>
       <p>
         Nonces don't even have to fully repeat. If <code>k</code> is merely
         <em>predictable</em> — a few high bits always zero because of a weak RNG or

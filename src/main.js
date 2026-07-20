@@ -164,10 +164,19 @@ async function main() {
     lattice:    panelLattice,
   };
 
+  // Deep-link each attack vector to the relevant /learn section.
+  const LEARN_ANCHORS = {
+    random: 'impossible', bip39: 'keys', puzzle: 'projects',
+    timestamp: 'cracked', profanity: 'profanity', randstorm: 'randstorm',
+    libbitcoin: 'milksad', crosschain: 'cracked', ecdsa: 'ecdsa', lattice: 'lattice',
+  };
+  const modeLearn = document.getElementById('mode-learn');
+
   function setMode(mode) {
     currentMode = mode;
     modeTabs.forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
     Object.entries(allPanels).forEach(([k, el]) => { el.hidden = k !== mode; });
+    if (modeLearn) modeLearn.href = `/learn#${LEARN_ANCHORS[mode] || ''}`;
   }
   modeTabs.forEach(t => t.addEventListener('click', () => setMode(t.dataset.mode)));
 

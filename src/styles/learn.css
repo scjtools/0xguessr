@@ -117,6 +117,7 @@ li { margin: 0.35rem 0; }
   padding: 1.1rem 1.3rem;
   margin: 1.25rem 0;
 }
+.case[id], h3[id] { scroll-margin-top: 4.5rem; }
 .case h4 { margin-top: 0; }
 .case .meta {
   display: flex;
