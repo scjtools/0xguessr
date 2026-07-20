@@ -101,7 +101,7 @@ function renderHeaderStats(stats) {
     `≈ ${fmtUsdShort(totalUsd)}`;
   document.getElementById('stat-odds').textContent = fmtOdds(stats.address_count);
   document.getElementById('stat-odds-flavor').textContent =
-    'about 10⁷× harder than picking one specific atom in the universe';
+    'harder than finding one atom in the universe';
   document.getElementById('stat-wallet-count').textContent = fmtNumber(stats.address_count);
   document.getElementById('stat-snapshot').textContent =
     `snapshot: ${stats.price_snapshot_date ?? '—'}`;

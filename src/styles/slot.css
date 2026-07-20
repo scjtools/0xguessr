@@ -8,12 +8,11 @@
 
 .machine-frame {
   position: relative;
-  background: linear-gradient(180deg, #2a2030 0%, #1a1320 100%);
-  border: 2px solid #3b2c1a;
+  background: linear-gradient(180deg, #221a2b 0%, #171019 100%);
+  border: 1px solid #3b2c1a;
   box-shadow:
-    0 0 0 4px #1a1320,
-    0 0 0 6px var(--accent),
-    0 12px 40px rgba(0, 0, 0, 0.6);
+    0 0 0 3px rgba(247, 147, 26, 0.22),
+    0 14px 44px rgba(0, 0, 0, 0.55);
   border-radius: 1rem;
   padding: 1.5rem 1.5rem 2rem;
   width: 100%;

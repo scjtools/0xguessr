@@ -29,29 +29,66 @@ body {
   flex-direction: column;
 }
 
+/* Top navigation bar */
+.topnav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+.nav-brand {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--accent);
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+.nav-links { display: flex; align-items: center; gap: 0.4rem; }
+.nav-learn {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1a1204;
+  background: var(--accent);
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.45rem;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.15s ease;
+}
+.nav-learn:hover { opacity: 0.88; }
+.nav-learn .nav-short { display: none; }
+.nav-ghost {
+  font-size: 0.85rem;
+  color: var(--ink-dim);
+  text-decoration: none;
+  padding: 0.45rem 0.55rem;
+}
+.nav-ghost:hover { color: var(--ink); }
+
+@media (max-width: 600px) {
+  .nav-learn .nav-full { display: none; }
+  .nav-learn .nav-short { display: inline; }
+  .nav-ghost { display: none; }
+}
+
 .topbar {
-  padding: 1.25rem 1rem 0.5rem;
+  padding: 1.9rem 1rem 1.1rem;
   text-align: center;
   border-bottom: 1px solid var(--border);
 }
 
-.topbar h1 {
-  margin: 0 0 0.5rem;
-  font-size: 1.6rem;
-  letter-spacing: 0.18em;
-  color: var(--accent);
-  text-shadow: 0 0 12px rgba(247, 147, 26, 0.35);
-}
-
 .tagline {
-  margin: 0.25rem 0 0.5rem;
-  font-size: clamp(1.6rem, 4.5vw, 2.6rem);
+  margin: 0 auto 1rem;
+  max-width: 18ch;
+  font-size: clamp(1.7rem, 4vw, 2.4rem);
   font-weight: 800;
-  letter-spacing: 0.02em;
+  line-height: 1.12;
+  letter-spacing: 0.01em;
   color: var(--win);
-  text-shadow:
-    0 0 14px rgba(43, 212, 125, 0.55),
-    0 0 32px rgba(43, 212, 125, 0.25);
+  text-shadow: 0 0 22px rgba(43, 212, 125, 0.28);
 }
 
 .stats {
@@ -87,8 +124,10 @@ body {
 .stat-sub {
   font-size: 0.72rem;
   color: var(--ink-dim);
-  margin-top: 0.15rem;
-  max-width: 22ch;
+  margin-top: 0.2rem;
+  max-width: 20ch;
+  min-height: 2.3em;
+  line-height: 1.35;
 }
 
 main {
