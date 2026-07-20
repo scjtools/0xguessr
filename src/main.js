@@ -1,3 +1,4 @@
+import { inject } from '@vercel/analytics';
 import { spin } from './game/spin.js';
 import { loadStats, loadBloom, checkAddress, confirmFunded } from './game/wallets.js';
 import {
@@ -27,6 +28,9 @@ import {
   verifyPrivKey, bigIntToBytes32,
 } from './game/ecdsa-nonce.js';
 import { latticeAttack } from './game/lattice.js';
+
+// Initialize Vercel Analytics
+inject();
 
 const AUTOSPIN_DELAY_MS = 250;
 const AUTOSPIN_DELAY_NO_DELAY_MS = 16;
