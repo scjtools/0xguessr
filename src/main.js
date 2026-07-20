@@ -96,8 +96,8 @@ function fmtTagline(usd) {
 }
 
 function renderHeaderStats(stats) {
-  const totalEth = stats.total_eth_approx;
-  const totalUsd = totalEth * stats.eth_usd_approx;
+  const totalEth = stats.total_eth_approx ?? 0;
+  const totalUsd = totalEth * (stats.eth_usd_approx ?? 0);
   document.getElementById('tagline').textContent = fmtTagline(totalUsd);
   document.getElementById('stat-jackpot-eth').textContent =
     `≈${fmtNumber(Math.round(totalEth))} ETH`;
@@ -108,7 +108,7 @@ function renderHeaderStats(stats) {
     'about 10⁷× harder than picking one specific atom in the universe';
   document.getElementById('stat-wallet-count').textContent = fmtNumber(stats.address_count);
   document.getElementById('stat-snapshot').textContent =
-    `price snapshot: ${stats.price_snapshot_date}`;
+    `price snapshot: ${stats.price_snapshot_date ?? '—'}`;
 }
 
 function shorten(s, n = 8) {
@@ -417,7 +417,7 @@ async function main() {
 
   const log = new Log(document.getElementById('log'));
   log.append(
-    `Loaded ${fmtNumber(stats.address_count)} wallets · jackpot ≈${fmtNumber(Math.round(stats.total_eth_approx))} ETH.`
+    `Loaded ${fmtNumber(stats.address_count)} wallets · jackpot ≈${fmtNumber(Math.round(stats.total_eth_approx ?? 0))} ETH.`
   );
   log.append(`Odds per spin: ${fmtOdds(stats.address_count)}.`);
   log.append('Pull the lever.');

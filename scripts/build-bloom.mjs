@@ -134,7 +134,15 @@ function main() {
   mkdirSync(dirname(OUT_BLOOM), { recursive: true });
   writeFileSync(OUT_BLOOM, out);
 
+  // Preserve display-only fields (total_eth_approx, eth_usd_approx,
+  // price_snapshot_date) that the UI reads but this script doesn't compute.
+  // Env vars override them when the caller has fresher values.
+  let prev = {};
+  try { prev = JSON.parse(readFileSync(OUT_META, 'utf8')); } catch { /* first run */ }
+  const numEnv = (k) => (process.env[k] != null && process.env[k] !== '' ? Number(process.env[k]) : undefined);
+
   const meta = {
+    ...prev,
     snapshot_date: new Date().toISOString(),
     source: process.env.BLOOM_SOURCE || 'unknown',
     query: `eth_balance >= ${THRESHOLD_WEI} (>= 1 ETH)`,
@@ -143,6 +151,9 @@ function main() {
     bloom_k_hashes: k,
     fp_rate: TARGET_FP,
     file_size_bytes: out.length,
+    total_eth_approx: numEnv('TOTAL_ETH_APPROX') ?? prev.total_eth_approx ?? null,
+    eth_usd_approx: numEnv('ETH_USD_APPROX') ?? prev.eth_usd_approx ?? null,
+    price_snapshot_date: process.env.PRICE_SNAPSHOT_DATE || prev.price_snapshot_date || null,
   };
   writeFileSync(OUT_META, JSON.stringify(meta, null, 2) + '\n');
 

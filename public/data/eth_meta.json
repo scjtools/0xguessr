@@ -6,5 +6,8 @@
   "bloom_m_bits": 42581128,
   "bloom_k_hashes": 20,
   "fp_rate": 0.000001,
-  "file_size_bytes": 5322657
+  "file_size_bytes": 5322657,
+  "total_eth_approx": 115000000,
+  "eth_usd_approx": 1847.31,
+  "price_snapshot_date": "2026-07-20"
 }
