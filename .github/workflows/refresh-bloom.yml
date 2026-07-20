@@ -80,16 +80,22 @@ jobs:
             exit 1
           fi
 
+      - name: Regenerate the OG social card with the fresh jackpot figure
+        continue-on-error: true
+        run: |
+          npm ci
+          node scripts/render-images.mjs
+
       - name: Commit if changed
         run: |
           rm -f addrs.csv
-          if git diff --quiet -- public/data/eth_bloom.bin public/data/eth_meta.json; then
-            echo "No change in bloom — nothing to commit."
+          if git diff --quiet -- public/data/eth_bloom.bin public/data/eth_meta.json public/og.png; then
+            echo "Nothing changed — nothing to commit."
             exit 0
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/data/eth_bloom.bin public/data/eth_meta.json
+          git add public/data/eth_bloom.bin public/data/eth_meta.json public/og.png
           count=$(node -e "console.log(require('./public/data/eth_meta.json').address_count)")
           git commit -m "chore: refresh ETH bloom ($count addresses)"
           git push

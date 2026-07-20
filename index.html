@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>0xguessr | Win up to $192 billion!</title>
+    <title>0xguessr | Win up to $__JACKPOT_B__ billion!</title>
     <meta name="description" content="A slot machine that guesses Ethereum private keys. Astronomically unlikely. Mathematically non-zero." />
     <link rel="canonical" href="https://0xguessr.sanjaycj.com/" />
     <meta name="robots" content="index, follow" />
@@ -19,7 +19,7 @@
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="0xguessr" />
-    <meta property="og:title" content="0xguessr | Win up to $192 billion!" />
+    <meta property="og:title" content="0xguessr | Win up to $__JACKPOT_B__ billion!" />
     <meta property="og:description" content="A slot machine that guesses Ethereum private keys. Astronomically unlikely. Mathematically non-zero." />
     <meta property="og:url" content="https://0xguessr.sanjaycj.com/" />
     <meta property="og:image" content="https://0xguessr.sanjaycj.com/og.png" />
@@ -29,7 +29,7 @@
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="0xguessr | Win up to $192 billion!" />
+    <meta name="twitter:title" content="0xguessr | Win up to $__JACKPOT_B__ billion!" />
     <meta name="twitter:description" content="A slot machine that guesses Ethereum private keys. Astronomically unlikely. Mathematically non-zero." />
     <meta name="twitter:image" content="https://0xguessr.sanjaycj.com/og.png" />
 
@@ -76,7 +76,10 @@
     </header>
 
     <main>
-      <div class="mode-tabs" role="tablist">
+      <div class="app-layout">
+        <aside class="mode-sidebar">
+          <div class="sidebar-label">Attack vector</div>
+          <div class="mode-tabs" role="tablist">
         <button class="mode-tab active" data-mode="random" role="tab">Random</button>
         <button class="mode-tab" data-mode="bip39" role="tab">BIP39</button>
         <span class="tab-sep" aria-hidden="true"></span>
@@ -89,8 +92,10 @@
         <span class="tab-sep" aria-hidden="true"></span>
         <button class="mode-tab" data-mode="ecdsa" role="tab">ECDSA Reuse</button>
         <button class="mode-tab" data-mode="lattice" role="tab">Lattice</button>
-      </div>
+          </div>
+        </aside>
 
+        <div class="app-content">
       <div class="mode-panel" id="panel-random">
         <p class="mode-desc">Your browser generates a cryptographically secure 256-bit number using <code>window.crypto</code> — the same RNG that secures your banking app. Totally unpredictable, no patterns.</p>
         <div class="mode-stats">
@@ -282,6 +287,8 @@
         <label for="log">Log</label>
         <textarea id="log" readonly aria-live="polite"></textarea>
       </section>
+        </div>
+      </div>
     </main>
 
     <dialog id="settings-dialog" class="settings-dialog">

@@ -7,11 +7,20 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Resvg } from '@resvg/resvg-js';
+import { jackpotBillions } from './jackpot.mjs';
 
-const PUB = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'public');
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const PUB = resolve(ROOT, 'public');
+
+let jackpot = '192';
+try {
+  jackpot = String(
+    jackpotBillions(JSON.parse(readFileSync(resolve(PUB, 'data/eth_meta.json'), 'utf8')))
+  );
+} catch { /* keep fallback */ }
 
 function render(svgName, outName, width) {
-  const svg = readFileSync(resolve(PUB, svgName), 'utf8');
+  const svg = readFileSync(resolve(PUB, svgName), 'utf8').replaceAll('__JACKPOT_B__', jackpot);
   const png = new Resvg(svg, {
     fitTo: { mode: 'width', value: width },
     font: { loadSystemFonts: true },
