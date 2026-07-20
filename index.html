@@ -79,22 +79,6 @@
       </div>
     </header>
 
-    <div class="statusbar">
-      <div class="spin-counter" title="Spins this session">
-        <span class="live-dot" aria-hidden="true"></span>
-        <span class="spin-count"><b id="live-spins">0</b> spins</span>
-        <span id="live-rate" class="spin-rate hidden"><span id="live-rate-val">0</span>/sec</span>
-      </div>
-      <div class="statusbar-actions">
-        <button class="settings-btn" id="settings-btn" type="button" aria-label="Settings">
-          <span aria-hidden="true">⚙</span> Settings
-        </button>
-        <button class="settings-btn share-btn" id="share-btn" type="button">
-          <span aria-hidden="true">↗</span> Share
-        </button>
-      </div>
-    </div>
-
     <main>
       <div class="app-layout">
         <aside class="mode-sidebar">
@@ -294,6 +278,22 @@
           <button class="lever" id="pull-btn" aria-label="Pull lever">
             <span class="lever-text">PULL</span>
           </button>
+
+          <div class="statusbar">
+            <div class="spin-counter" title="Spins this session">
+              <span class="live-dot" aria-hidden="true"></span>
+              <span class="spin-count"><b id="live-spins">0</b> spins</span>
+              <span id="live-rate" class="spin-rate hidden"><span id="live-rate-val">0</span>/sec</span>
+            </div>
+            <div class="statusbar-actions">
+              <button class="settings-btn" id="settings-btn" type="button" aria-label="Settings">
+                <span aria-hidden="true">⚙</span> Settings
+              </button>
+              <button class="settings-btn share-btn" id="share-btn" type="button">
+                <span aria-hidden="true">↗</span> Share
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
