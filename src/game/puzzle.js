@@ -8,8 +8,6 @@ export function resetPuzzle(start = 1n) {
   _counter = typeof start === 'bigint' ? start : BigInt(start);
 }
 
-export function getPuzzleCounter() { return _counter; }
-
 export function nextPuzzleKey() {
   const index = _counter;
   const key = new Uint8Array(32);

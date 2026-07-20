@@ -5,21 +5,21 @@ import {
   randomPrivKey,
   deriveAll,
   parsePrivKey,
+  bytesToHex,
+  fmtEth,
 } from './game/crypto.js';
 import { Log } from './ui/log.js';
 import { ClassicReels } from './ui/slot-classic.js';
 import { RealisticReels } from './ui/slot-realistic.js';
 import { WinDialog } from './ui/win-dialog.js';
 import { sfx, setMuted, unlock } from './audio/audio.js';
-import { recordSpin, getStats, getTier, milestoneMessage } from './ui/stats.js';
+import { recordSpin, getStats, milestoneMessage } from './ui/stats.js';
 import { drawShareCard, downloadCard, copyCardToClipboard } from './ui/share-card.js';
-import { resetProfanity, getProfanitySeed } from './game/profanity.js';
-import { resetPuzzle, getPuzzleCounter } from './game/puzzle.js';
-import {
-  resetTimestamp, getTimestampProgress, tsToDate, ETH_GENESIS_TS,
-} from './game/timestamp-scan.js';
-import { resetRandstorm, getRandstormSeed } from './game/randstorm.js';
-import { resetLibbitcoin, getLibbitcoinSeed } from './game/libbitcoin.js';
+import { resetProfanity } from './game/profanity.js';
+import { resetPuzzle } from './game/puzzle.js';
+import { resetTimestamp, tsToDate } from './game/timestamp-scan.js';
+import { resetRandstorm } from './game/randstorm.js';
+import { resetLibbitcoin } from './game/libbitcoin.js';
 import {
   loadCrosschainKeys, getCrosschainProgress, resetCrosschain, BUILTIN_CROSSCHAIN_KEYS,
 } from './game/crosschain.js';
@@ -66,14 +66,6 @@ function showToast(message) {
 
 function fmtNumber(n) {
   return n.toLocaleString('en-US');
-}
-
-// Format a wei balance (bigint) as an ETH string, e.g. "3.42 ETH".
-function fmtEth(wei) {
-  if (wei == null) return '≥1 ETH';
-  const eth = Number(wei) / 1e18;
-  const dp = eth >= 1000 ? 0 : eth >= 1 ? 2 : 4;
-  return `${eth.toLocaleString('en-US', { maximumFractionDigits: dp })} ETH`;
 }
 
 function fmtUsdShort(usd) {
@@ -348,7 +340,7 @@ async function main() {
         const verified = verifyPrivKey(privKeyBig, address);
         if (verified) {
           const privBytes = bigIntToBytes32(privKeyBig);
-          const privHex = Array.from(privBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+          const privHex = bytesToHex(privBytes);
           analysisLog(logEl, `KEY RECOVERED: 0x${privHex}`, 'ok');
           statusEl.textContent = 'Private key recovered!';
           const derived = deriveAll(privBytes);
@@ -387,12 +379,11 @@ async function main() {
       return;
     }
 
-    const sigs = rawSigs.map((s, i) => {
-      const hash = typeof s.hash === 'string' ? BigInt(s.hash) : BigInt(s.hash);
-      const r    = typeof s.r   === 'string' ? BigInt(s.r)    : BigInt(s.r);
-      const sv   = typeof s.s   === 'string' ? BigInt(s.s)    : BigInt(s.s);
-      return { hash, r, s: sv };
-    });
+    const sigs = rawSigs.map((s) => ({
+      hash: BigInt(s.hash),
+      r: BigInt(s.r),
+      s: BigInt(s.s),
+    }));
 
     const bias = biasRaw ? parseInt(biasRaw, 10) : null;
     analysisLog(logEl, `Running LLL on ${sigs.length} signature(s), bias=${bias ?? 'auto'}…`);
@@ -406,7 +397,7 @@ async function main() {
           analysisLog(logEl, result.error, 'err');
           statusEl.textContent = 'No key found.';
         } else {
-          const privHex = Array.from(result.privKeyBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+          const privHex = bytesToHex(result.privKeyBytes);
           analysisLog(logEl, `KEY RECOVERED (bias=${result.biasBits}b, ${result.sigsUsed} sigs): 0x${privHex}`, 'ok');
           statusEl.textContent = 'Private key recovered!';
           const derived = deriveAll(result.privKeyBytes);

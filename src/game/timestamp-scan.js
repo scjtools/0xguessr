@@ -5,7 +5,7 @@ import { sha256 } from '@noble/hashes/sha256';
 // sha256(timestamp_string). We scan every second from Ethereum genesis onward.
 // Range: 2015-07-30 (ETH genesis) → now  ≈ 315 million timestamps
 
-export const ETH_GENESIS_TS = 1438300800; // 2015-07-30 00:00:00 UTC
+const ETH_GENESIS_TS = 1438300800; // 2015-07-30 00:00:00 UTC
 
 let _ts    = ETH_GENESIS_TS;
 let _tsEnd = Math.floor(Date.now() / 1000);
@@ -13,10 +13,6 @@ let _tsEnd = Math.floor(Date.now() / 1000);
 export function resetTimestamp(startTs = ETH_GENESIS_TS, endTs = null) {
   _ts    = startTs;
   _tsEnd = endTs ?? Math.floor(Date.now() / 1000);
-}
-
-export function getTimestampProgress() {
-  return { current: _ts, start: ETH_GENESIS_TS, end: _tsEnd };
 }
 
 export function tsToDate(ts) {

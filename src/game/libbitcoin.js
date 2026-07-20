@@ -50,8 +50,6 @@ function mt32Key(seed32) {
 let _seed = 0;
 
 export function resetLibbitcoin(startSeed = 0) { _seed = startSeed >>> 0; }
-export function getLibbitcoinSeed() { return _seed; }
-export function libbitcoinTotal() { return 0x100000000; }
 
 export function nextLibbitcoinKey() {
   if (_seed >= 0x100000000) return { key: null, seed: _seed, exhausted: true };

@@ -1,5 +1,5 @@
 import confetti from 'canvas-confetti';
-import { bytesToHex } from '../game/crypto.js';
+import { bytesToHex, fmtEth } from '../game/crypto.js';
 
 export class WinDialog {
   constructor(dialog) {
@@ -35,14 +35,6 @@ export class WinDialog {
 
     fireConfetti();
   }
-}
-
-// Confirmed on-chain balance (bigint wei) → "3.42 ETH". Null → generic label.
-function fmtEth(wei) {
-  if (wei == null) return '≥1 ETH';
-  const eth = Number(wei) / 1e18;
-  const dp = eth >= 1000 ? 0 : eth >= 1 ? 2 : 4;
-  return `${eth.toLocaleString('en-US', { maximumFractionDigits: dp })} ETH`;
 }
 
 function fireConfetti() {
