@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>How Ethereum Private Keys Get Cracked | 0xguessr</title>
+    <meta name="description" content="How Ethereum keys and seed phrases work, why brute-forcing is impossible, and the real vulnerabilities — Randstorm, Milk Sad, Profanity, nonce reuse, brain wallets — that have actually drained wallets. Plus live key-cracking projects and the quantum threat." />
+    <link rel="canonical" href="https://0xguessr.sanjaycj.com/learn" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#0d0e12" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="0xguessr" />
+    <meta property="og:title" content="How Ethereum Private Keys Get Cracked" />
+    <meta property="og:description" content="Seed phrases, keyspace math, and the real vulnerabilities that have drained crypto wallets — Randstorm, Milk Sad, Profanity, ECDSA nonce reuse, brain wallets — plus the quantum threat." />
+    <meta property="og:url" content="https://0xguessr.sanjaycj.com/learn" />
+    <meta property="og:image" content="https://0xguessr.sanjaycj.com/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="How Ethereum Private Keys Get Cracked" />
+    <meta name="twitter:description" content="Seed phrases, keyspace math, and the real vulnerabilities that have drained crypto wallets — plus the quantum threat." />
+    <meta name="twitter:image" content="https://0xguessr.sanjaycj.com/og.png" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "How Ethereum Private Keys Get Cracked",
+        "description": "How Ethereum keys and seed phrases work, why brute-forcing is impossible, and the real vulnerabilities that have drained wallets.",
+        "author": { "@type": "Organization", "name": "0xguessr" },
+        "publisher": { "@type": "Organization", "name": "0xguessr" },
+        "mainEntityOfPage": "https://0xguessr.sanjaycj.com/learn"
+      }
+    </script>
+
+    <link rel="stylesheet" href="/src/styles/learn.css" />
+  </head>
+  <body>
+    <nav class="learn-nav">
+      <a href="/" class="brand">0xguessr</a>
+      <a href="/" class="play-btn">← Play the slot machine</a>
+    </nav>
+
+    <article>
+      <h1 class="hero-title">How Ethereum Private Keys Get Cracked</h1>
+      <p class="hero-sub">
+        Guessing a random Ethereum key is impossible. Yet wallets get drained
+        every year — not by luck, but by broken randomness, reused numbers, and
+        human shortcuts. Here's how the cryptography works, why brute force
+        can't win, and every real-world attack that has.
+      </p>
+
+      <div class="toc">
+        <h2>Contents</h2>
+        <ol>
+          <li><a href="#keys">How Ethereum keys &amp; seed phrases work</a></li>
+          <li><a href="#impossible">Why brute-forcing is impossible</a></li>
+          <li><a href="#cracked">How wallets actually get drained</a></li>
+          <li><a href="#projects">Live key-cracking projects to watch</a></li>
+          <li><a href="#quantum">Emerging threats: quantum &amp; beyond</a></li>
+        </ol>
+      </div>
+
+      <h2 class="section" id="keys">1. How Ethereum keys &amp; seed phrases work</h2>
+      <p>
+        An Ethereum private key is nothing more than a random 256-bit number — a
+        value between 1 and roughly 1.158 × 10<sup>77</sup>. Everything else is
+        derived from it deterministically:
+      </p>
+      <ul>
+        <li>The private key is multiplied against the <b>secp256k1</b> elliptic curve's generator point to produce a 64-byte <b>public key</b>.</li>
+        <li>That public key is hashed with <b>Keccak-256</b>, and the last 20 bytes become your <code>0x…</code> <b>address</b>.</li>
+      </ul>
+      <p>
+        This is a one-way street. Address → public key → private key cannot be
+        reversed; the only way "back" is to already hold the key.
+      </p>
+
+      <h3>Where seed phrases come in</h3>
+      <p>
+        Nobody memorises a 256-bit number, so wallets use the <b>BIP39</b>
+        standard. A chunk of raw entropy (128 bits for 12 words, 256 bits for 24)
+        is encoded as words from a fixed 2,048-word list. Those words are stretched
+        through <b>2,048 rounds of PBKDF2-HMAC-SHA512</b> into a 512-bit seed. From
+        that seed, <b>BIP32</b> builds a hierarchical tree of keys, and <b>BIP44</b>
+        picks the standard Ethereum path <code>m/44'/60'/0'/0/0</code>.
+      </p>
+      <p>
+        The crucial takeaway: <b>your wallet is only as strong as the entropy at
+        the very start.</b> A beautiful 24-word phrase generated from a broken
+        random number generator is just as weak as the broken number was. Almost
+        every attack below is an attack on that initial entropy — not on the
+        elliptic-curve math, which has never been broken.
+      </p>
+
+      <h2 class="section" id="impossible">2. Why brute-forcing is impossible</h2>
+      <p>
+        There are 2<sup>256</sup> possible private keys — about
+        1.16 × 10<sup>77</sup>. That number is so large it defeats intuition, so
+        here are honest comparisons:
+      </p>
+      <ul>
+        <li>There are an estimated 10<sup>78</sup>–10<sup>82</sup> atoms in the observable universe. The Ethereum keyspace is on the same order of magnitude as <em>counting a meaningful fraction of every atom in existence</em>.</li>
+        <li>If every one of the ~8 billion people on Earth ran a billion GPUs, each checking a trillion keys per second, since the Big Bang — you would have covered less than a <b>quadrillionth of a quadrillionth</b> of the keyspace.</li>
+        <li>The energy required to merely <em>count</em> to 2<sup>256</sup> in the most efficient computer physically possible would boil the oceans several times over (this is the Landauer-limit argument).</li>
+      </ul>
+      <div class="callout">
+        This is why the <a href="/">0xguessr slot machine</a>'s "Random" mode has
+        odds of roughly <b>1 in 7.9 × 10<sup>70</sup></b> per spin. It is not a
+        game you can win by playing longer. It is a demonstration that the number
+        is real, but the odds are not.
+      </div>
+
+      <h2 class="section" id="cracked">3. How wallets actually get drained</h2>
+      <p>
+        Every real theft that "cracked a key" attacked <b>weak entropy</b> or
+        <b>reused secrets</b> — never the curve itself. Each attack below has a
+        matching mode in the <a href="/">0xguessr</a> machine so you can watch the
+        exact algorithm run.
+      </p>
+
+      <h3>Weak random number generators</h3>
+
+      <div class="case">
+        <h4>Randstorm — BitcoinJS, 2011–2015</h4>
+        <div class="meta">
+          <span><b>Disclosed:</b> Nov 2023, Unciphered</span>
+          <span><b>Estimated exposure:</b> ~1.4M BTC</span>
+          <span><b>Effective entropy:</b> as low as ~48 bits</span>
+        </div>
+        <p>
+          Millions of early web wallets (including many made on blockchain.info)
+          were built with the <b>BitcoinJS</b> library, which called JSBN's
+          <code>SecureRandom()</code>. In browsers of that era, this fell back to
+          <code>Math.random()</code> — implemented in V8 as <b>MWC1616</b>, seeded
+          with only 32 bits. Combined with buggy pooling, real entropy collapsed
+          to as little as 48 bits. Unciphered demonstrated recovery of live keys.
+          Wallets made before March 2012 are the easiest to attack.
+        </p>
+        <p><a href="https://www.unciphered.com/disclosure-of-vulnerable-bitcoin-wallet-library-2/" target="_blank" rel="noopener">Unciphered disclosure →</a></p>
+        <span class="try">▶ Try it: Randstorm mode replays the MWC1616 → RC4 pipeline across all 2³² seeds.</span>
+      </div>
+
+      <div class="case">
+        <h4>Milk Sad — Libbitcoin Explorer, CVE-2023-39910</h4>
+        <div class="meta">
+          <span><b>Exploited:</b> Jun–Jul 2023</span>
+          <span><b>Wallets hit:</b> 2,600+</span>
+          <span><b>Losses:</b> ~$900k</span>
+        </div>
+        <p>
+          The <code>bx seed</code> command in Libbitcoin Explorer — a tool featured
+          in the book <em>Mastering Bitcoin</em> — seeded a 32-bit Mersenne Twister
+          (MT19937) with the current system time. That collapses any "256-bit" seed
+          to just <b>2<sup>32</sup> ≈ 4.3 billion</b> possibilities, brute-forceable
+          on a laptop in days. The vulnerability's name comes from the first
+          mnemonic its broken generator produces: "milk sad…".
+        </p>
+        <p><a href="https://milksad.info/" target="_blank" rel="noopener">milksad.info full write-up →</a></p>
+        <span class="try">▶ Try it: Libbitcoin mode reproduces the exact MT19937 seed pipeline.</span>
+      </div>
+
+      <div class="case">
+        <h4>Profanity — vanity address generator (the Wintermute hack)</h4>
+        <div class="meta">
+          <span><b>Disclosed:</b> Sep 2022, 1inch</span>
+          <span><b>Headline loss:</b> $160M (Wintermute)</span>
+          <span><b>Keyspace:</b> 2<sup>32</sup></span>
+        </div>
+        <p>
+          <b>Profanity</b> was a popular tool for generating "vanity" addresses with
+          custom prefixes (like seven leading zeros). It seeded
+          <code>mt19937_64</code> with a single 32-bit value from
+          <code>random_device</code> — so every key it ever produced came from only
+          <b>2<sup>32</sup></b> possibilities, and the process was reversible from
+          any public key. In September 2022, the market maker <b>Wintermute</b> lost
+          ~$160M when an attacker cracked a Profanity-generated admin wallet that
+          still held vault permissions.
+        </p>
+        <p><a href="https://medium.com/amber-group/exploiting-the-profanity-flaw-e986576de7ab" target="_blank" rel="noopener">Amber Group technical breakdown →</a></p>
+        <span class="try">▶ Try it: Profanity mode iterates all 2³² seeds through the same generator.</span>
+      </div>
+
+      <h3>Reused numbers: ECDSA nonce reuse</h3>
+      <p>
+        Every ECDSA signature uses a one-time random number called a <b>nonce</b>
+        (<code>k</code>). If a wallet ever signs two different transactions with the
+        <em>same</em> <code>k</code>, both signatures share the same <code>r</code>
+        value — and the private key falls out with simple algebra:
+        <code>k = (h₁−h₂)/(s₁−s₂) mod n</code>, then
+        <code>d = (s₁k−h₁)/r mod n</code>.
+      </p>
+      <div class="case">
+        <h4>Android SecureRandom — 2013 Bitcoin thefts</h4>
+        <div class="meta">
+          <span><b>Date:</b> August 2013</span>
+          <span><b>Cause:</b> broken <code>SecureRandom</code> on Android</span>
+        </div>
+        <p>
+          A flaw in Android's <code>SecureRandom</code> produced repeated nonces
+          across signatures in several Bitcoin wallet apps (Bitcoin Wallet,
+          blockchain.info, Mycelium and others). Attackers scanned the chain for
+          repeated <code>r</code> values and drained the exposed addresses. It
+          prompted an official Bitcoin.org security advisory.
+        </p>
+      </div>
+      <div class="case">
+        <h4>Sony PlayStation 3 — a constant nonce (2010)</h4>
+        <p>
+          Not a wallet, but the canonical example: Sony signed PS3 firmware with a
+          <em>fixed</em> nonce instead of a random one. At the 2010 Chaos Communication
+          Congress, the group fail0verflow recovered Sony's master ECDSA signing key
+          from two signatures — the same math that recovers wallet keys today.
+        </p>
+        <span class="try">▶ Try it: ECDSA Reuse mode fetches an address's transactions and checks for repeated r values.</span>
+      </div>
+
+      <h3>Biased nonces: lattice attacks</h3>
+      <p>
+        Nonces don't even have to fully repeat. If <code>k</code> is merely
+        <em>predictable</em> — a few high bits always zero because of a weak RNG or
+        a buggy hardware wallet — then <b>LLL lattice reduction</b> can recover the
+        private key from as few as 2–4 signatures. This is how several
+        hardware-wallet and library bugs have been turned into key recovery.
+      </p>
+      <p><span class="try">▶ Try it: Lattice mode runs LLL basis reduction on a set of signatures.</span></p>
+
+      <h3>Human shortcuts: brain wallets</h3>
+      <p>
+        A "brain wallet" turns a passphrase into a key by hashing it once with
+        SHA-256 — the idea being you only have to remember a phrase. In practice,
+        anything a human can remember, an attacker can guess. Researchers (notably
+        Ryan Castellucci's DEF CON 23 talk, and academic studies of the "brain
+        wallet drain") showed that automated bots pre-compute millions of candidate
+        phrases and <b>sweep any funds within seconds</b> of a deposit. Quotes,
+        song lyrics, Bible verses, and "correct horse battery staple" were all
+        emptied almost instantly.
+      </p>
+
+      <h3>Other low-entropy patterns</h3>
+      <ul>
+        <li><b>Timestamp seeds:</b> naive scripts that used <code>sha256(timestamp)</code> reduce the keyspace to the number of seconds in a range — a few hundred million values. (Timestamp mode.)</li>
+        <li><b>Sequential keys:</b> keys 1, 2, 3… map to real, long-emptied addresses. (Puzzle mode.)</li>
+        <li><b>Cross-chain reuse:</b> a private key exposed on Bitcoin controls the <em>same</em> key's Ethereum address — different derivation, identical secret. (Cross-chain mode.)</li>
+      </ul>
+
+      <h2 class="section" id="projects">4. Live key-cracking projects to watch</h2>
+
+      <h3>The Bitcoin Puzzle Transaction (2015)</h3>
+      <p>
+        In January 2015 an anonymous creator sent Bitcoin to 256 addresses whose
+        private keys have deliberately increasing bit-length — puzzle #1 uses a
+        1-bit key, #2 a 2-bit key, and so on. It was designed as a public benchmark
+        for how far key-search has progressed. In April 2023 the prizes were raised
+        roughly tenfold; the outstanding bounty now totals on the order of
+        <b>~950–990 BTC</b> (tens of millions of dollars).
+      </p>
+      <p>
+        Every key from #1 to about #70 has been found, along with several higher
+        ones. The active frontier is puzzle <b>#71</b> and above. A recurring twist:
+        when a solver broadcasts their claim, the key is briefly visible in the
+        mempool, and front-running bots have stolen prizes (as happened on #66 and
+        #69). Trackers:
+      </p>
+      <ul>
+        <li><a href="https://privatekeys.pw/puzzles/bitcoin-puzzle-tx" target="_blank" rel="noopener">privatekeys.pw — Bitcoin puzzle tracker</a></li>
+        <li><a href="https://btcpuzzle.info/" target="_blank" rel="noopener">btcpuzzle.info — live puzzle list</a></li>
+      </ul>
+
+      <h3>Key directories &amp; historical efforts</h3>
+      <ul>
+        <li><a href="https://privatekeys.pw/" target="_blank" rel="noopener">privatekeys.pw</a> and <a href="https://keys.lol/" target="_blank" rel="noopener">keys.lol</a> — sites that let you browse the (astronomically large) key space page by page. A vivid, safe way to grasp how empty it is: every page you load is guaranteed to show unfunded addresses.</li>
+        <li><b>Large Bitcoin Collider (LBC):</b> a distributed volunteer project (~2016–2017) that pooled compute to search for funded keys and collisions. It found only a handful of already-known puzzle keys before winding down — a real-world confirmation that random search is hopeless.</li>
+      </ul>
+
+      <h3>What about Satoshi's coins?</h3>
+      <p>
+        Roughly 1.1M BTC sit in early-2009 addresses following the "Patoshi" mining
+        pattern, widely attributed to Satoshi Nakamoto. These are <em>watched</em>,
+        not <em>crackable</em> — they were generated with proper entropy, so the only
+        way they ever move is if whoever holds the keys chooses to spend them. Every
+        so often a dormant early address wakes up and the whole industry notices.
+      </p>
+
+      <h2 class="section" id="quantum">5. Emerging threats: quantum &amp; beyond</h2>
+      <p>
+        The one thing that could someday break the elliptic-curve math itself is a
+        large-scale <b>quantum computer</b>. Shor's algorithm can, in principle,
+        derive a private key from a <em>public</em> key in polynomial time — turning
+        the one-way street into a two-way one.
+      </p>
+      <ul>
+        <li><b>Not all addresses are equal.</b> A never-spent-from address only ever exposes its <em>address</em> (a hash), not its public key — which offers some protection. But the moment you send a transaction, your public key is revealed on-chain. Reused addresses are therefore the most exposed.</li>
+        <li><b>"Harvest now, decrypt later":</b> adversaries can archive today's exposed public keys and wait for hardware to catch up. Estimates for a cryptographically-relevant quantum computer range from a decade to never, but the risk is why the field is moving now.</li>
+        <li><b>The response:</b> NIST has standardised post-quantum signature schemes, and Ethereum's roadmap (account abstraction, and research into quantum-resistant signatures) aims to let accounts migrate to new cryptography without abandoning their funds.</li>
+      </ul>
+
+      <div class="callout win">
+        <b>The honest bottom line.</b> No one has ever cracked a properly-generated
+        Ethereum key, and — barring quantum computers — no one will. Every real theft
+        exploited a mistake in <em>how</em> a key was created or used. Funded keys
+        that do leak are swept by bots within milliseconds. 0xguessr exists to make
+        that math visible and visceral — not to find you a fortune.
+      </div>
+
+      <p style="margin-top:2rem">
+        <a href="/" class="brand" style="text-decoration:none">← Back to the slot machine</a>
+      </p>
+    </article>
+
+    <footer>
+      <p>
+        0xguessr — an educational demonstration. Nothing here is financial advice
+        or an endorsement of theft. Sources are linked inline; figures are
+        approximate and reflect public reporting at the time of writing.
+      </p>
+      <p><a href="https://github.com/scjtools/0xguessr" target="_blank" rel="noopener">Source on GitHub</a></p>
+    </footer>
+  </body>
+</html>
