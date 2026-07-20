@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Sequential &amp; Puzzle Keys: The Bitcoin Puzzle Transaction | 0xguessr</title>
+    <meta name="description" content="Low-numbered private keys map to real, long-emptied addresses. Learn about sequential key scanning and the 2015 Bitcoin Puzzle Transaction still worth ~950+ BTC." />
+    <link rel="canonical" href="https://0xguessr.sanjaycj.com/puzzle" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#0d0e12" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="0xguessr" />
+    <meta property="og:title" content="Sequential and puzzle keys" />
+    <meta property="og:description" content="Low-numbered private keys map to real, long-emptied addresses. Learn about sequential key scanning and the 2015 Bitcoin Puzzle Transaction still worth ~950+ BTC." />
+    <meta property="og:url" content="https://0xguessr.sanjaycj.com/puzzle" />
+    <meta property="og:image" content="https://0xguessr.sanjaycj.com/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Sequential and puzzle keys" />
+    <meta name="twitter:description" content="Low-numbered private keys map to real, long-emptied addresses. Learn about sequential key scanning and the 2015 Bitcoin Puzzle Transaction still worth ~950+ BTC." />
+    <meta name="twitter:image" content="https://0xguessr.sanjaycj.com/og.png" />
+
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Sequential and puzzle keys","description":"Low-numbered private keys map to real, long-emptied addresses. Learn about sequential key scanning and the 2015 Bitcoin Puzzle Transaction still worth ~950+ BTC.","author":{"@type":"Organization","name":"0xguessr"},"publisher":{"@type":"Organization","name":"0xguessr"},"mainEntityOfPage":"https://0xguessr.sanjaycj.com/puzzle"}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://0xguessr.sanjaycj.com/"},{"@type":"ListItem","position":2,"name":"Learn","item":"https://0xguessr.sanjaycj.com/learn"},{"@type":"ListItem","position":3,"name":"Puzzle","item":"https://0xguessr.sanjaycj.com/puzzle"}]}</script>
+
+    <link rel="stylesheet" href="/src/styles/learn.css" />
+  </head>
+  <body>
+    <nav class="learn-nav">
+      <a href="/" class="brand">0xguessr</a>
+      <a href="/" class="play-btn">← Play the slot machine</a>
+    </nav>
+
+    <article>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a> <span aria-hidden="true">›</span>
+        <a href="/learn">Learn</a> <span aria-hidden="true">›</span>
+        <span>Puzzle</span>
+      </nav>
+
+      <h1 class="hero-title">Sequential and puzzle keys</h1>
+      <p class="hero-sub">Private keys 1, 2, 3… correspond to real Ethereum and Bitcoin addresses. The lowest ones have been swept countless times — but a famous puzzle keeps the high end interesting.</p>
+
+      <h2>Scanning from key #1</h2>
+      <p>Private key <code>0x0000…0001</code> is a valid key that controls a real address. So does #2, #3, and so on. These low keys have been discovered and emptied by researchers and bots many times over; anything sent to them is swept within seconds. The interesting question is how far up anyone has actually searched.</p>
+
+      <h2>The Bitcoin Puzzle Transaction (2015)</h2>
+      <p>In January 2015, an anonymous creator sent Bitcoin to 256 addresses whose private keys have deliberately increasing bit-length: puzzle #1 uses a 1-bit key, #2 a 2-bit key, up to #256. It was built as a public benchmark for how far key-search technology has progressed. In April 2023 the prizes were raised roughly tenfold; the outstanding bounty now totals on the order of <strong>~950–990 BTC</strong>.</p>
+      <p>Keys up to about #70 have been solved, along with several higher ones. The active frontier is puzzle <strong>#71</strong> and above. For puzzles where the public key is exposed, solvers use <strong>Pollard's kangaroo</strong> and <strong>baby-step giant-step</strong> algorithms to search a known, bounded range far faster than blind brute force.</p>
+      <p>A recurring twist: when a solver broadcasts their claim, the key is briefly visible in the mempool, and front-running bots have stolen prizes — as happened on puzzles #66 and #69.</p>
+      <ul>
+        <li><a href="https://privatekeys.pw/puzzles/bitcoin-puzzle-tx" target="_blank" rel="noopener">privatekeys.pw — puzzle tracker</a></li>
+        <li><a href="https://btcpuzzle.info/" target="_blank" rel="noopener">btcpuzzle.info — live status</a></li>
+      </ul>
+
+      <h2>Why full sequential scanning fails</h2>
+      <p>Bounded ranges with exposed public keys are tractable. Scanning the <em>entire</em> 2<sup>256</sup> space sequentially is not — you would exhaust the universe's energy budget long before reaching any funded modern wallet.</p>
+    
+      <div class="try-cta">
+        <a href="/?mode=puzzle" class="try-btn">▶ Try the Puzzle mode in the game</a>
+      </div>
+
+      <p style="margin-top:1.75rem">
+        <a href="/learn">← Back to all attack vectors</a>
+      </p>
+    </article>
+
+    <footer>
+      <p>
+        0xguessr — an educational demonstration. Sources are linked inline;
+        figures are approximate and reflect public reporting at the time of writing.
+      </p>
+      <p><a href="https://github.com/scjtools/0xguessr" target="_blank" rel="noopener">Source on GitHub</a></p>
+    </footer>
+  </body>
+</html>

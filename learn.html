@@ -81,6 +81,17 @@
       }
     </script>
 
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://0xguessr.sanjaycj.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Learn", "item": "https://0xguessr.sanjaycj.com/learn" }
+        ]
+      }
+    </script>
+
     <link rel="stylesheet" href="/src/styles/learn.css" />
   </head>
   <body>
@@ -90,6 +101,9 @@
     </nav>
 
     <article>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a> <span aria-hidden="true">›</span> <span>Learn</span>
+      </nav>
       <h1 class="hero-title">How Ethereum Private Keys Get Cracked</h1>
       <p class="hero-sub">
         Guessing a random Ethereum key is impossible. Yet wallets get drained
@@ -187,7 +201,7 @@
           Wallets made before March 2012 are the easiest to attack.
         </p>
         <p><a href="https://www.unciphered.com/disclosure-of-vulnerable-bitcoin-wallet-library-2/" target="_blank" rel="noopener">Unciphered disclosure →</a></p>
-        <span class="try">▶ Try it: Randstorm mode replays the MWC1616 → RC4 pipeline across all 2³² seeds.</span>
+        <a class="try" href="/randstorm">▶ Read the full Randstorm breakdown →</a>
       </div>
 
       <div class="case" id="milksad">
@@ -206,7 +220,7 @@
           mnemonic its broken generator produces: "milk sad…".
         </p>
         <p><a href="https://milksad.info/" target="_blank" rel="noopener">milksad.info full write-up →</a></p>
-        <span class="try">▶ Try it: Libbitcoin mode reproduces the exact MT19937 seed pipeline.</span>
+        <a class="try" href="/libbitcoin">▶ Read the full Milk Sad breakdown →</a>
       </div>
 
       <div class="case" id="profanity">
@@ -227,7 +241,7 @@
           still held vault permissions.
         </p>
         <p><a href="https://medium.com/amber-group/exploiting-the-profanity-flaw-e986576de7ab" target="_blank" rel="noopener">Amber Group technical breakdown →</a></p>
-        <span class="try">▶ Try it: Profanity mode iterates all 2³² seeds through the same generator.</span>
+        <a class="try" href="/profanity">▶ Read the full Profanity breakdown →</a>
       </div>
 
       <h3 id="ecdsa">Reused numbers: ECDSA nonce reuse</h3>
@@ -261,7 +275,7 @@
           Congress, the group fail0verflow recovered Sony's master ECDSA signing key
           from two signatures — the same math that recovers wallet keys today.
         </p>
-        <span class="try">▶ Try it: ECDSA Reuse mode fetches an address's transactions and checks for repeated r values.</span>
+        <a class="try" href="/ecdsa-reuse">▶ Read the full ECDSA nonce-reuse breakdown →</a>
       </div>
 
       <h3 id="lattice">Biased nonces: lattice attacks</h3>
@@ -272,7 +286,7 @@
         private key from as few as 2–4 signatures. This is how several
         hardware-wallet and library bugs have been turned into key recovery.
       </p>
-      <p><span class="try">▶ Try it: Lattice mode runs LLL basis reduction on a set of signatures.</span></p>
+      <p><a class="try" href="/lattice">▶ Read the full lattice-attack breakdown →</a></p>
 
       <h3>Human shortcuts: brain wallets</h3>
       <p>

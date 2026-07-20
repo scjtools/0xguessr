@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>ECDSA Nonce Reuse: How One Repeated Number Leaks a Key | 0xguessr</title>
+    <meta name="description" content="If two ECDSA signatures reuse the same nonce k, they share an r value and the private key falls out algebraically. It drained Android Bitcoin wallets and broke the PS3." />
+    <link rel="canonical" href="https://0xguessr.sanjaycj.com/ecdsa-reuse" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#0d0e12" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="0xguessr" />
+    <meta property="og:title" content="ECDSA nonce reuse" />
+    <meta property="og:description" content="If two ECDSA signatures reuse the same nonce k, they share an r value and the private key falls out algebraically. It drained Android Bitcoin wallets and broke the PS3." />
+    <meta property="og:url" content="https://0xguessr.sanjaycj.com/ecdsa-reuse" />
+    <meta property="og:image" content="https://0xguessr.sanjaycj.com/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ECDSA nonce reuse" />
+    <meta name="twitter:description" content="If two ECDSA signatures reuse the same nonce k, they share an r value and the private key falls out algebraically. It drained Android Bitcoin wallets and broke the PS3." />
+    <meta name="twitter:image" content="https://0xguessr.sanjaycj.com/og.png" />
+
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"ECDSA nonce reuse","description":"If two ECDSA signatures reuse the same nonce k, they share an r value and the private key falls out algebraically. It drained Android Bitcoin wallets and broke the PS3.","author":{"@type":"Organization","name":"0xguessr"},"publisher":{"@type":"Organization","name":"0xguessr"},"mainEntityOfPage":"https://0xguessr.sanjaycj.com/ecdsa-reuse"}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://0xguessr.sanjaycj.com/"},{"@type":"ListItem","position":2,"name":"Learn","item":"https://0xguessr.sanjaycj.com/learn"},{"@type":"ListItem","position":3,"name":"ECDSA Reuse","item":"https://0xguessr.sanjaycj.com/ecdsa-reuse"}]}</script>
+
+    <link rel="stylesheet" href="/src/styles/learn.css" />
+  </head>
+  <body>
+    <nav class="learn-nav">
+      <a href="/" class="brand">0xguessr</a>
+      <a href="/" class="play-btn">← Play the slot machine</a>
+    </nav>
+
+    <article>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a> <span aria-hidden="true">›</span>
+        <a href="/learn">Learn</a> <span aria-hidden="true">›</span>
+        <span>ECDSA Reuse</span>
+      </nav>
+
+      <h1 class="hero-title">ECDSA nonce reuse</h1>
+      <p class="hero-sub">Every signature needs a fresh random number. Reuse it once — across two transactions — and anyone can recover your private key with grade-school algebra.</p>
+
+      <h2>The math</h2>
+      <p>Each ECDSA signature uses a one-time random <strong>nonce</strong> <code>k</code>. The signature's <code>r</code> value is derived only from <code>k</code>, so if the same <code>k</code> signs two different messages, both signatures share the same <code>r</code>. Given two such signatures <code>(r, s₁, h₁)</code> and <code>(r, s₂, h₂)</code>:</p>
+      <p style="font-family:var(--mono);font-size:0.9rem"><code>k = (h₁ − h₂) / (s₁ − s₂) mod n</code>, then <code>d = (s₁·k − h₁) / r mod n</code></p>
+      <p>Two equations, one unknown — the private key <code>d</code> pops right out. No brute force required.</p>
+
+      <h2>Real cases</h2>
+      <div class="case">
+        <h4>Android Bitcoin thefts (August 2013)</h4>
+        <p>A flaw in Android's <code>SecureRandom</code> produced repeated nonces across signatures in several Bitcoin wallet apps. Attackers scanned the blockchain for duplicate <code>r</code> values and drained the exposed addresses, prompting an official Bitcoin.org advisory.</p>
+      </div>
+      <div class="case">
+        <h4>Sony PlayStation 3 (2010)</h4>
+        <p>The canonical example: Sony signed PS3 firmware with a <em>fixed</em> nonce instead of a random one. At the 2010 Chaos Communication Congress, the group fail0verflow recovered Sony's master ECDSA signing key from two signatures — the very same math.</p>
+      </div>
+
+      <h2>The defense</h2>
+      <p>Use <strong>deterministic nonces</strong> per RFC 6979, which derive <code>k</code> from the message and private key so it is never accidentally repeated. Every reputable modern wallet library does this by default. This mode fetches an address's transaction history and checks for repeated <code>r</code> values.</p>
+    
+      <div class="try-cta">
+        <a href="/?mode=ecdsa" class="try-btn">▶ Try the ECDSA Reuse mode in the game</a>
+      </div>
+
+      <p style="margin-top:1.75rem">
+        <a href="/learn">← Back to all attack vectors</a>
+      </p>
+    </article>
+
+    <footer>
+      <p>
+        0xguessr — an educational demonstration. Sources are linked inline;
+        figures are approximate and reflect public reporting at the time of writing.
+      </p>
+      <p><a href="https://github.com/scjtools/0xguessr" target="_blank" rel="noopener">Source on GitHub</a></p>
+    </footer>
+  </body>
+</html>

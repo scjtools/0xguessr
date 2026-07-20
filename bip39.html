@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>How BIP39 Seed Phrases Work (and Where They Break) | 0xguessr</title>
+    <meta name="description" content="BIP39 turns 12 or 24 words into an Ethereum key via PBKDF2, BIP32 and BIP44. Learn how seed phrases work — and why weak entropy, not the words, is the real risk." />
+    <link rel="canonical" href="https://0xguessr.sanjaycj.com/bip39" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#0d0e12" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="0xguessr" />
+    <meta property="og:title" content="BIP39 seed phrases: how 12 or 24 words become a key" />
+    <meta property="og:description" content="BIP39 turns 12 or 24 words into an Ethereum key via PBKDF2, BIP32 and BIP44. Learn how seed phrases work — and why weak entropy, not the words, is the real risk." />
+    <meta property="og:url" content="https://0xguessr.sanjaycj.com/bip39" />
+    <meta property="og:image" content="https://0xguessr.sanjaycj.com/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="BIP39 seed phrases: how 12 or 24 words become a key" />
+    <meta name="twitter:description" content="BIP39 turns 12 or 24 words into an Ethereum key via PBKDF2, BIP32 and BIP44. Learn how seed phrases work — and why weak entropy, not the words, is the real risk." />
+    <meta name="twitter:image" content="https://0xguessr.sanjaycj.com/og.png" />
+
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"BIP39 seed phrases: how 12 or 24 words become a key","description":"BIP39 turns 12 or 24 words into an Ethereum key via PBKDF2, BIP32 and BIP44. Learn how seed phrases work — and why weak entropy, not the words, is the real risk.","author":{"@type":"Organization","name":"0xguessr"},"publisher":{"@type":"Organization","name":"0xguessr"},"mainEntityOfPage":"https://0xguessr.sanjaycj.com/bip39"}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://0xguessr.sanjaycj.com/"},{"@type":"ListItem","position":2,"name":"Learn","item":"https://0xguessr.sanjaycj.com/learn"},{"@type":"ListItem","position":3,"name":"BIP39","item":"https://0xguessr.sanjaycj.com/bip39"}]}</script>
+
+    <link rel="stylesheet" href="/src/styles/learn.css" />
+  </head>
+  <body>
+    <nav class="learn-nav">
+      <a href="/" class="brand">0xguessr</a>
+      <a href="/" class="play-btn">← Play the slot machine</a>
+    </nav>
+
+    <article>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a> <span aria-hidden="true">›</span>
+        <a href="/learn">Learn</a> <span aria-hidden="true">›</span>
+        <span>BIP39</span>
+      </nav>
+
+      <h1 class="hero-title">BIP39 seed phrases: how 12 or 24 words become a key</h1>
+      <p class="hero-sub">Every hardware wallet — Ledger, Trezor, MetaMask — hands you a list of words. Those words are not the key; they are a human-readable encoding of the entropy behind it.</p>
+
+      <h2>How BIP39 works, step by step</h2>
+      <ol>
+        <li><strong>Entropy.</strong> The wallet generates 128 bits of randomness (for 12 words) or 256 bits (for 24 words).</li>
+        <li><strong>Checksum + words.</strong> A few bits of SHA-256 checksum are appended, and the result is sliced into 11-bit chunks. Each chunk indexes into a fixed list of <strong>2,048 words</strong>. That is why a valid phrase must come from that exact list, and why a wrong word is usually detected.</li>
+        <li><strong>Seed.</strong> The words are stretched through <strong>2,048 rounds of PBKDF2-HMAC-SHA512</strong> (with an optional passphrase) into a 512-bit seed. This is BIP39.</li>
+        <li><strong>Derivation.</strong> BIP32 turns the seed into a hierarchical tree of keys, and BIP44 selects the standard Ethereum path <code>m/44'/60'/0'/0/0</code>.</li>
+      </ol>
+
+      <h2>Same odds as "Random"</h2>
+      <p>A 12-word phrase encodes exactly 128 bits of entropy; a 24-word phrase encodes 256. Guessing a valid, funded phrase is therefore mathematically identical to guessing a random key — 1 in 2<sup>128</sup> or 2<sup>256</sup>. The words make the secret memorable, not weaker.</p>
+
+      <h2>Where BIP39 actually breaks</h2>
+      <p>The danger is never the standard — it is the <strong>entropy fed into step 1</strong>. If a wallet's random number generator is broken, a beautiful 24-word phrase can carry far less than 256 bits of real randomness. That is exactly what happened with <a href="/randstorm">Randstorm</a> and <a href="/libbitcoin">Milk Sad</a>, where seemingly-strong mnemonics were brute-forced because the underlying entropy had collapsed to 32 bits.</p>
+      <p>Other real risks: writing a phrase into a networked device, using a weak custom passphrase, or trusting a wallet with an unaudited RNG.</p>
+    
+      <div class="try-cta">
+        <a href="/?mode=bip39" class="try-btn">▶ Try the BIP39 mode in the game</a>
+      </div>
+
+      <p style="margin-top:1.75rem">
+        <a href="/learn">← Back to all attack vectors</a>
+      </p>
+    </article>
+
+    <footer>
+      <p>
+        0xguessr — an educational demonstration. Sources are linked inline;
+        figures are approximate and reflect public reporting at the time of writing.
+      </p>
+      <p><a href="https://github.com/scjtools/0xguessr" target="_blank" rel="noopener">Source on GitHub</a></p>
+    </footer>
+  </body>
+</html>

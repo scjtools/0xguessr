@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Can You Guess a Random Ethereum Private Key? | 0xguessr</title>
+    <meta name="description" content="A random Ethereum private key is a 256-bit number — one of 2^256 (~1.16×10^77) possibilities. Here is exactly why brute-forcing it is physically impossible." />
+    <link rel="canonical" href="https://0xguessr.sanjaycj.com/random" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#0d0e12" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="0xguessr" />
+    <meta property="og:title" content="Guessing a random Ethereum private key" />
+    <meta property="og:description" content="A random Ethereum private key is a 256-bit number — one of 2^256 (~1.16×10^77) possibilities. Here is exactly why brute-forcing it is physically impossible." />
+    <meta property="og:url" content="https://0xguessr.sanjaycj.com/random" />
+    <meta property="og:image" content="https://0xguessr.sanjaycj.com/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Guessing a random Ethereum private key" />
+    <meta name="twitter:description" content="A random Ethereum private key is a 256-bit number — one of 2^256 (~1.16×10^77) possibilities. Here is exactly why brute-forcing it is physically impossible." />
+    <meta name="twitter:image" content="https://0xguessr.sanjaycj.com/og.png" />
+
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Guessing a random Ethereum private key","description":"A random Ethereum private key is a 256-bit number — one of 2^256 (~1.16×10^77) possibilities. Here is exactly why brute-forcing it is physically impossible.","author":{"@type":"Organization","name":"0xguessr"},"publisher":{"@type":"Organization","name":"0xguessr"},"mainEntityOfPage":"https://0xguessr.sanjaycj.com/random"}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://0xguessr.sanjaycj.com/"},{"@type":"ListItem","position":2,"name":"Learn","item":"https://0xguessr.sanjaycj.com/learn"},{"@type":"ListItem","position":3,"name":"Random","item":"https://0xguessr.sanjaycj.com/random"}]}</script>
+
+    <link rel="stylesheet" href="/src/styles/learn.css" />
+  </head>
+  <body>
+    <nav class="learn-nav">
+      <a href="/" class="brand">0xguessr</a>
+      <a href="/" class="play-btn">← Play the slot machine</a>
+    </nav>
+
+    <article>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a> <span aria-hidden="true">›</span>
+        <a href="/learn">Learn</a> <span aria-hidden="true">›</span>
+        <span>Random</span>
+      </nav>
+
+      <h1 class="hero-title">Guessing a random Ethereum private key</h1>
+      <p class="hero-sub">The purest attack — and the one that can never work. Generate a random 256-bit number, derive its address, and hope it holds funds. Here is the math that makes it hopeless.</p>
+
+      <h2>How it works</h2>
+      <p>An Ethereum private key is simply a random integer between 1 and roughly 1.16 × 10<sup>77</sup> (that is 2<sup>256</sup>). The "Random" mode generates one using your browser's <code>window.crypto.getRandomValues()</code> — the same cryptographically-secure generator that protects your bank's TLS connection — then derives the address: multiply against the secp256k1 curve to get a public key, hash it with Keccak-256, and take the last 20 bytes.</p>
+      <p>That derived address is checked against a Bloom filter of ~1.5 million addresses that currently hold at least 1 ETH. A hit is confirmed with a live on-chain balance call before anything is declared a win.</p>
+
+      <h2>Why it is physically impossible to brute-force</h2>
+      <p>2<sup>256</sup> is not just a big number — it is a number that defeats brute force at the level of physics:</p>
+      <ul>
+        <li>There are an estimated 10<sup>78</sup>–10<sup>82</sup> atoms in the observable universe. The keyspace is on that same scale.</li>
+        <li>If all 8 billion people each ran a billion GPUs checking a trillion keys per second since the Big Bang, they would have covered far less than a quadrillionth of a quadrillionth of the space.</li>
+        <li>By Landauer's limit, merely <em>counting</em> to 2<sup>256</sup> on the most efficient computer physically possible would require more energy than boiling every ocean on Earth many times over.</li>
+      </ul>
+      <p>Crucially, there is no strategy that beats uniform randomness. Every key is equally likely, so no ordering, pattern, or heuristic improves your odds above the base rate.</p>
+
+      <h2>The real lesson</h2>
+      <p>Because pure guessing is hopeless, every real-world wallet theft has instead attacked <strong>how a key was generated or used</strong> — weak randomness, reused numbers, or human-chosen secrets. Those are the other modes in this game, and each is a genuine, documented failure.</p>
+    
+      <div class="try-cta">
+        <a href="/?mode=random" class="try-btn">▶ Try the Random mode in the game</a>
+      </div>
+
+      <p style="margin-top:1.75rem">
+        <a href="/learn">← Back to all attack vectors</a>
+      </p>
+    </article>
+
+    <footer>
+      <p>
+        0xguessr — an educational demonstration. Sources are linked inline;
+        figures are approximate and reflect public reporting at the time of writing.
+      </p>
+      <p><a href="https://github.com/scjtools/0xguessr" target="_blank" rel="noopener">Source on GitHub</a></p>
+    </footer>
+  </body>
+</html>

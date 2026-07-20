@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>0xguessr | Win more than __JACKPOT_B__ billion dollars!</title>
-    <meta name="description" content="A slot machine that guesses Ethereum private keys. Astronomically unlikely. Mathematically non-zero." />
+    <meta name="description" content="Spin a slot machine that guesses Ethereum private keys and checks them against real funded wallets — 100% in your browser. Astronomically unlikely, mathematically non-zero." />
     <link rel="canonical" href="https://0xguessr.sanjaycj.com/" />
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#0d0e12" />
@@ -21,7 +21,7 @@
     <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content="0xguessr" />
     <meta property="og:title" content="0xguessr | Win more than __JACKPOT_B__ billion dollars!" />
-    <meta property="og:description" content="A slot machine that guesses Ethereum private keys. Astronomically unlikely. Mathematically non-zero." />
+    <meta property="og:description" content="Spin a slot machine that guesses Ethereum private keys and checks them against real funded wallets — 100% in your browser. Astronomically unlikely, mathematically non-zero." />
     <meta property="og:url" content="https://0xguessr.sanjaycj.com/" />
     <meta property="og:image" content="https://0xguessr.sanjaycj.com/og.png" />
     <meta property="og:image:width" content="1200" />
@@ -31,7 +31,7 @@
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="0xguessr | Win more than __JACKPOT_B__ billion dollars!" />
-    <meta name="twitter:description" content="A slot machine that guesses Ethereum private keys. Astronomically unlikely. Mathematically non-zero." />
+    <meta name="twitter:description" content="Spin a slot machine that guesses Ethereum private keys and checks them against real funded wallets — 100% in your browser. Astronomically unlikely, mathematically non-zero." />
     <meta name="twitter:image" content="https://0xguessr.sanjaycj.com/og.png" />
 
     <script type="application/ld+json">
@@ -42,7 +42,7 @@
         "url": "https://0xguessr.sanjaycj.com/",
         "applicationCategory": "GameApplication",
         "operatingSystem": "Any (web browser)",
-        "description": "A slot machine that guesses Ethereum private keys. Astronomically unlikely. Mathematically non-zero.",
+        "description": "Spin a slot machine that guesses Ethereum private keys and checks them against real funded wallets — 100% in your browser. Astronomically unlikely, mathematically non-zero.",
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
       }
     </script>
@@ -78,6 +78,22 @@
         </div>
       </div>
     </header>
+
+    <div class="statusbar">
+      <div class="spin-counter" title="Spins this session">
+        <span class="live-dot" aria-hidden="true"></span>
+        <span class="spin-count"><b id="live-spins">0</b> spins</span>
+        <span id="live-rate" class="spin-rate hidden"><span id="live-rate-val">0</span>/sec</span>
+      </div>
+      <div class="statusbar-actions">
+        <button class="settings-btn" id="settings-btn" type="button" aria-label="Settings">
+          <span aria-hidden="true">⚙</span> Settings
+        </button>
+        <button class="settings-btn share-btn" id="share-btn" type="button">
+          <span aria-hidden="true">↗</span> Share
+        </button>
+      </div>
+    </div>
 
     <main>
       <div class="app-layout">
@@ -261,10 +277,11 @@
         <div id="lattice-log" class="analysis-log" hidden></div>
       </div>
 
-      <a id="mode-learn" class="panel-learn" href="/learn#impossible">📖 Read the full breakdown of this attack →</a>
+      <a id="mode-learn" class="panel-learn" href="/random">📖 Read the full breakdown of this attack →</a>
 
       <section class="machine">
         <div class="machine-frame">
+          <p class="machine-cta">Do you feel lucky, punk?</p>
           <div class="reels" id="reels-classic" data-mode="classic">
             <div class="reel" data-i="0"><span class="reel-symbol">?</span></div>
             <div class="reel" data-i="1"><span class="reel-symbol">?</span></div>
@@ -277,24 +294,6 @@
           <button class="lever" id="pull-btn" aria-label="Pull lever">
             <span class="lever-text">PULL</span>
           </button>
-        </div>
-
-        <div class="tracker">
-          <p class="tracker-cta">Do you feel lucky, punk?</p>
-          <div class="tracker-row">
-            <span class="tracker-live">
-              <span class="live-dot" aria-hidden="true"></span>
-              <b id="live-spins">0 spins</b><span id="live-rate" class="hidden"> · <span id="live-rate-val">0</span>/sec</span>
-            </span>
-            <span class="tracker-buttons">
-              <button class="settings-btn" id="settings-btn" type="button" aria-label="Settings">
-                <span aria-hidden="true">⚙</span> Settings
-              </button>
-              <button class="settings-btn share-btn" id="share-btn" type="button">
-                <span aria-hidden="true">↗</span> Share
-              </button>
-            </span>
-          </div>
         </div>
       </section>
 

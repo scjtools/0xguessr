@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { jackpotBillions } from './scripts/jackpot.mjs';
+import { ATTACKS } from './scripts/attacks.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SITE = 'https://0xguessr.sanjaycj.com';
@@ -40,10 +41,14 @@ function sitemapPlugin() {
         );
         if (meta.price_snapshot_date) homeDate = meta.price_snapshot_date;
       } catch { /* keep today */ }
+      const attackUrls = ATTACKS.map(
+        (a) => `  <url><loc>${SITE}/${a.slug}</loc><lastmod>${today}</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>`
+      ).join('\n');
       const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>${SITE}/</loc><lastmod>${homeDate}</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
   <url><loc>${SITE}/learn</loc><lastmod>${today}</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+${attackUrls}
 </urlset>
 `;
       try { writeFileSync(resolve(__dirname, 'dist/sitemap.xml'), xml); } catch { /* dist may not exist in dev */ }
@@ -61,6 +66,9 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         learn: resolve(__dirname, 'learn.html'),
+        ...Object.fromEntries(
+          ATTACKS.map((a) => [a.slug, resolve(__dirname, `${a.slug}.html`)])
+        ),
       },
     },
   },

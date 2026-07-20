@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Milk Sad (CVE-2023-39910): The Libbitcoin bx seed Flaw | 0xguessr</title>
+    <meta name="description" content="Milk Sad (CVE-2023-39910) is a weak-entropy flaw in Libbitcoin Explorer's bx seed. It seeded a 32-bit Mersenne Twister with system time, collapsing the keyspace to 2^32." />
+    <link rel="canonical" href="https://0xguessr.sanjaycj.com/libbitcoin" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#0d0e12" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="0xguessr" />
+    <meta property="og:title" content="Milk Sad (CVE-2023-39910): the bx seed disaster" />
+    <meta property="og:description" content="Milk Sad (CVE-2023-39910) is a weak-entropy flaw in Libbitcoin Explorer's bx seed. It seeded a 32-bit Mersenne Twister with system time, collapsing the keyspace to 2^32." />
+    <meta property="og:url" content="https://0xguessr.sanjaycj.com/libbitcoin" />
+    <meta property="og:image" content="https://0xguessr.sanjaycj.com/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Milk Sad (CVE-2023-39910): the bx seed disaster" />
+    <meta name="twitter:description" content="Milk Sad (CVE-2023-39910) is a weak-entropy flaw in Libbitcoin Explorer's bx seed. It seeded a 32-bit Mersenne Twister with system time, collapsing the keyspace to 2^32." />
+    <meta name="twitter:image" content="https://0xguessr.sanjaycj.com/og.png" />
+
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Milk Sad (CVE-2023-39910): the bx seed disaster","description":"Milk Sad (CVE-2023-39910) is a weak-entropy flaw in Libbitcoin Explorer's bx seed. It seeded a 32-bit Mersenne Twister with system time, collapsing the keyspace to 2^32.","author":{"@type":"Organization","name":"0xguessr"},"publisher":{"@type":"Organization","name":"0xguessr"},"mainEntityOfPage":"https://0xguessr.sanjaycj.com/libbitcoin"}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://0xguessr.sanjaycj.com/"},{"@type":"ListItem","position":2,"name":"Learn","item":"https://0xguessr.sanjaycj.com/learn"},{"@type":"ListItem","position":3,"name":"Libbitcoin","item":"https://0xguessr.sanjaycj.com/libbitcoin"}]}</script>
+
+    <link rel="stylesheet" href="/src/styles/learn.css" />
+  </head>
+  <body>
+    <nav class="learn-nav">
+      <a href="/" class="brand">0xguessr</a>
+      <a href="/" class="play-btn">← Play the slot machine</a>
+    </nav>
+
+    <article>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a> <span aria-hidden="true">›</span>
+        <a href="/learn">Learn</a> <span aria-hidden="true">›</span>
+        <span>Libbitcoin</span>
+      </nav>
+
+      <h1 class="hero-title">Milk Sad (CVE-2023-39910): the bx seed disaster</h1>
+      <p class="hero-sub">A command-line tool featured in the book Mastering Bitcoin generated "random" seeds from the clock — reducing any wallet it created to 4.3 billion guessable possibilities.</p>
+
+      <div class="case">
+        <div class="meta">
+          <span><b>Exploited:</b> Jun–Jul 2023</span>
+          <span><b>Wallets affected:</b> 2,600+</span>
+          <span><b>Losses:</b> ~$900k</span>
+        </div>
+      </div>
+
+      <h2>How it worked</h2>
+      <p>The <code>bx seed</code> command in <strong>Libbitcoin Explorer 3.0.0–3.6.0</strong> generated seed entropy by seeding a standard 32-bit <strong>MT19937</strong> Mersenne Twister with the current system time. Regardless of how long the resulting mnemonic looked, its true entropy was only <strong>2<sup>32</sup> ≈ 4.3 billion</strong> possibilities — brute-forceable on a single laptop in days. The vulnerability's name comes from the first mnemonic the broken generator produces: "milk sad…".</p>
+
+      <h2>The impact</h2>
+      <p>Researchers confirmed the flaw affected 2,600+ wallets across multiple chains and tied it to real thefts totalling roughly $900k. Because <code>bx</code> was a respected, widely-cited tool, victims had no reason to suspect their carefully-backed-up seed phrases were worthless.</p>
+
+      <h2>The defense</h2>
+      <p>Any wallet created with a vulnerable <code>bx seed</code> must be abandoned and its funds moved. More broadly: never trust a seed generator that uses a non-cryptographic PRNG (like a plain Mersenne Twister) or seeds from the clock.</p>
+      <p><a href="https://milksad.info/" target="_blank" rel="noopener">The Milk Sad disclosure →</a> · <a href="https://nvd.nist.gov/vuln/detail/CVE-2023-39910" target="_blank" rel="noopener">CVE-2023-39910</a></p>
+    
+      <div class="try-cta">
+        <a href="/?mode=libbitcoin" class="try-btn">▶ Try the Libbitcoin mode in the game</a>
+      </div>
+
+      <p style="margin-top:1.75rem">
+        <a href="/learn">← Back to all attack vectors</a>
+      </p>
+    </article>
+
+    <footer>
+      <p>
+        0xguessr — an educational demonstration. Sources are linked inline;
+        figures are approximate and reflect public reporting at the time of writing.
+      </p>
+      <p><a href="https://github.com/scjtools/0xguessr" target="_blank" rel="noopener">Source on GitHub</a></p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Randstorm: Millions of 2011–2015 Bitcoin Wallets at Risk | 0xguessr</title>
+    <meta name="description" content="Randstorm is a flaw in the BitcoinJS library used by millions of 2011–2015 web wallets. Weak browser randomness collapsed key entropy to as little as 48 bits." />
+    <link rel="canonical" href="https://0xguessr.sanjaycj.com/randstorm" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#0d0e12" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="0xguessr" />
+    <meta property="og:title" content="Randstorm: the BitcoinJS wallets of 2011–2015" />
+    <meta property="og:description" content="Randstorm is a flaw in the BitcoinJS library used by millions of 2011–2015 web wallets. Weak browser randomness collapsed key entropy to as little as 48 bits." />
+    <meta property="og:url" content="https://0xguessr.sanjaycj.com/randstorm" />
+    <meta property="og:image" content="https://0xguessr.sanjaycj.com/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Randstorm: the BitcoinJS wallets of 2011–2015" />
+    <meta name="twitter:description" content="Randstorm is a flaw in the BitcoinJS library used by millions of 2011–2015 web wallets. Weak browser randomness collapsed key entropy to as little as 48 bits." />
+    <meta name="twitter:image" content="https://0xguessr.sanjaycj.com/og.png" />
+
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Randstorm: the BitcoinJS wallets of 2011–2015","description":"Randstorm is a flaw in the BitcoinJS library used by millions of 2011–2015 web wallets. Weak browser randomness collapsed key entropy to as little as 48 bits.","author":{"@type":"Organization","name":"0xguessr"},"publisher":{"@type":"Organization","name":"0xguessr"},"mainEntityOfPage":"https://0xguessr.sanjaycj.com/randstorm"}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://0xguessr.sanjaycj.com/"},{"@type":"ListItem","position":2,"name":"Learn","item":"https://0xguessr.sanjaycj.com/learn"},{"@type":"ListItem","position":3,"name":"Randstorm","item":"https://0xguessr.sanjaycj.com/randstorm"}]}</script>
+
+    <link rel="stylesheet" href="/src/styles/learn.css" />
+  </head>
+  <body>
+    <nav class="learn-nav">
+      <a href="/" class="brand">0xguessr</a>
+      <a href="/" class="play-btn">← Play the slot machine</a>
+    </nav>
+
+    <article>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a> <span aria-hidden="true">›</span>
+        <a href="/learn">Learn</a> <span aria-hidden="true">›</span>
+        <span>Randstorm</span>
+      </nav>
+
+      <h1 class="hero-title">Randstorm: the BitcoinJS wallets of 2011–2015</h1>
+      <p class="hero-sub">A combination of a weak JavaScript RNG and a popular wallet library left millions of early web wallets — worth over a billion dollars — with dangerously guessable keys.</p>
+
+      <div class="case">
+        <div class="meta">
+          <span><b>Disclosed:</b> Nov 2023, by Unciphered</span>
+          <span><b>Estimated exposure:</b> ~1.4M BTC</span>
+          <span><b>Effective entropy:</b> as low as ~48 bits</span>
+        </div>
+      </div>
+
+      <h2>How the entropy collapsed</h2>
+      <p>Millions of wallets from 2011–2015 (including many created on blockchain.info) were built with the <strong>BitcoinJS</strong> library. It relied on JSBN's <code>SecureRandom()</code>, which in the browsers of that era fell back to <code>Math.random()</code>. Chrome/V8 then implemented <code>Math.random()</code> as <strong>MWC1616</strong>, seeded with only 32 bits, and the way the entropy pool was filled and RC4-scrambled reduced real randomness further — to as little as 48 bits. That is well within reach of a determined attacker.</p>
+      <p>Unciphered demonstrated recovering live keys. Wallets generated before March 2012 are the easiest to attack; later ones added more entropy but remained weaker than intended. This mode replays the MWC1616 → pool → RC4 pipeline across all 2<sup>32</sup> seeds.</p>
+
+      <h2>The defense</h2>
+      <p>If you hold funds in a wallet created between 2011 and 2015 through a browser-based service, treat the keys as potentially exposed and migrate the funds to a freshly-generated wallet from modern, audited software.</p>
+      <p><a href="https://www.unciphered.com/disclosure-of-vulnerable-bitcoin-wallet-library-2/" target="_blank" rel="noopener">Unciphered's Randstorm disclosure →</a></p>
+    
+      <div class="try-cta">
+        <a href="/?mode=randstorm" class="try-btn">▶ Try the Randstorm mode in the game</a>
+      </div>
+
+      <p style="margin-top:1.75rem">
+        <a href="/learn">← Back to all attack vectors</a>
+      </p>
+    </article>
+
+    <footer>
+      <p>
+        0xguessr — an educational demonstration. Sources are linked inline;
+        figures are approximate and reflect public reporting at the time of writing.
+      </p>
+      <p><a href="https://github.com/scjtools/0xguessr" target="_blank" rel="noopener">Source on GitHub</a></p>
+    </footer>
+  </body>
+</html>

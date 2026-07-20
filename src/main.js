@@ -114,8 +114,7 @@ function shorten(s, n = 8) {
 
 function updateLiveBar(isAutospinning) {
   const { total = 0 } = getStats();
-  document.getElementById('live-spins').textContent =
-    `${total.toLocaleString('en-US')} spin${total === 1 ? '' : 's'}`;
+  document.getElementById('live-spins').textContent = total.toLocaleString('en-US');
   const rateEl  = document.getElementById('live-rate');
   const rateVal = document.getElementById('live-rate-val');
   const rate = getSpinsPerSec();
@@ -164,11 +163,11 @@ async function main() {
     lattice:    panelLattice,
   };
 
-  // Deep-link each attack vector to the relevant /learn section.
-  const LEARN_ANCHORS = {
-    random: 'impossible', bip39: 'keys', puzzle: 'projects',
-    timestamp: 'cracked', profanity: 'profanity', randstorm: 'randstorm',
-    libbitcoin: 'milksad', crosschain: 'cracked', ecdsa: 'ecdsa', lattice: 'lattice',
+  // Each attack vector has a dedicated deep-dive page at /<slug>.
+  const MODE_PAGES = {
+    random: 'random', bip39: 'bip39', puzzle: 'puzzle', timestamp: 'timestamp',
+    profanity: 'profanity', randstorm: 'randstorm', libbitcoin: 'libbitcoin',
+    crosschain: 'cross-chain', ecdsa: 'ecdsa-reuse', lattice: 'lattice',
   };
   const modeLearn = document.getElementById('mode-learn');
 
@@ -176,9 +175,13 @@ async function main() {
     currentMode = mode;
     modeTabs.forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
     Object.entries(allPanels).forEach(([k, el]) => { el.hidden = k !== mode; });
-    if (modeLearn) modeLearn.href = `/learn#${LEARN_ANCHORS[mode] || ''}`;
+    if (modeLearn) modeLearn.href = `/${MODE_PAGES[mode] || 'learn'}`;
   }
   modeTabs.forEach(t => t.addEventListener('click', () => setMode(t.dataset.mode)));
+
+  // Deep-link a mode from the attack pages: /?mode=randstorm
+  const urlMode = new URLSearchParams(location.search).get('mode');
+  if (urlMode && allPanels[urlMode]) setMode(urlMode);
 
   // BIP39 word count
   document.querySelectorAll('[name="bip-words"]').forEach(r =>

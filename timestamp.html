@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Timestamp-Seeded Keys: When Time Is the Only Entropy | 0xguessr</title>
+    <meta name="description" content="Naive wallet scripts sometimes seed keys with the current time, shrinking the keyspace to a few hundred million values. Here is how time-based key generation gets cracked." />
+    <link rel="canonical" href="https://0xguessr.sanjaycj.com/timestamp" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#0d0e12" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="0xguessr" />
+    <meta property="og:title" content="Timestamp-seeded keys" />
+    <meta property="og:description" content="Naive wallet scripts sometimes seed keys with the current time, shrinking the keyspace to a few hundred million values. Here is how time-based key generation gets cracked." />
+    <meta property="og:url" content="https://0xguessr.sanjaycj.com/timestamp" />
+    <meta property="og:image" content="https://0xguessr.sanjaycj.com/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Timestamp-seeded keys" />
+    <meta name="twitter:description" content="Naive wallet scripts sometimes seed keys with the current time, shrinking the keyspace to a few hundred million values. Here is how time-based key generation gets cracked." />
+    <meta name="twitter:image" content="https://0xguessr.sanjaycj.com/og.png" />
+
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Timestamp-seeded keys","description":"Naive wallet scripts sometimes seed keys with the current time, shrinking the keyspace to a few hundred million values. Here is how time-based key generation gets cracked.","author":{"@type":"Organization","name":"0xguessr"},"publisher":{"@type":"Organization","name":"0xguessr"},"mainEntityOfPage":"https://0xguessr.sanjaycj.com/timestamp"}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://0xguessr.sanjaycj.com/"},{"@type":"ListItem","position":2,"name":"Learn","item":"https://0xguessr.sanjaycj.com/learn"},{"@type":"ListItem","position":3,"name":"Timestamp","item":"https://0xguessr.sanjaycj.com/timestamp"}]}</script>
+
+    <link rel="stylesheet" href="/src/styles/learn.css" />
+  </head>
+  <body>
+    <nav class="learn-nav">
+      <a href="/" class="brand">0xguessr</a>
+      <a href="/" class="play-btn">← Play the slot machine</a>
+    </nav>
+
+    <article>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a> <span aria-hidden="true">›</span>
+        <a href="/learn">Learn</a> <span aria-hidden="true">›</span>
+        <span>Timestamp</span>
+      </nav>
+
+      <h1 class="hero-title">Timestamp-seeded keys</h1>
+      <p class="hero-sub">Some early scripts generated keys from the clock — sha256(timestamp) or an RNG seeded with the time. That turns 2^256 possibilities into merely "how many seconds are there?"</p>
+
+      <h2>How it works</h2>
+      <p>If a key is derived from the moment it was created — for example <code>sha256(Date.now())</code> or a generator seeded with <code>time()</code> — then the only unknown is <em>when</em> the wallet was made. Scan every second from Ethereum's genesis (30 July 2015) to today and you have covered every possibility: only a few hundred million values, checkable in minutes.</p>
+      <p>This mode scans exactly that: one candidate key per second across the chain's lifetime, hashing the decimal timestamp string the way naive scripts did.</p>
+
+      <h2>Why it is a real risk</h2>
+      <p>Time is the classic "looks random but isn't" seed. It appears unpredictable to a human but is trivially enumerable for a machine, and an attacker who knows roughly when a wallet was created can narrow the range even further. The catastrophic <a href="/libbitcoin">Milk Sad</a> vulnerability was fundamentally this mistake — a Mersenne Twister seeded with the system time — dressed up behind a respectable-looking mnemonic.</p>
+
+      <h2>The defense</h2>
+      <p>Never seed key material from the clock, a counter, or any low-entropy source. Use a cryptographically-secure RNG that draws from the operating system's entropy pool (<code>getrandom</code>, <code>/dev/urandom</code>, <code>crypto.getRandomValues</code>).</p>
+    
+      <div class="try-cta">
+        <a href="/?mode=timestamp" class="try-btn">▶ Try the Timestamp mode in the game</a>
+      </div>
+
+      <p style="margin-top:1.75rem">
+        <a href="/learn">← Back to all attack vectors</a>
+      </p>
+    </article>
+
+    <footer>
+      <p>
+        0xguessr — an educational demonstration. Sources are linked inline;
+        figures are approximate and reflect public reporting at the time of writing.
+      </p>
+      <p><a href="https://github.com/scjtools/0xguessr" target="_blank" rel="noopener">Source on GitHub</a></p>
+    </footer>
+  </body>
+</html>

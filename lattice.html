@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Lattice Attacks: Recovering Keys from Biased Nonces | 0xguessr</title>
+    <meta name="description" content="Nonces don't have to fully repeat. If a few bits are predictable, LLL lattice reduction can recover an ECDSA private key from as few as 2–4 signatures." />
+    <link rel="canonical" href="https://0xguessr.sanjaycj.com/lattice" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#0d0e12" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="0xguessr" />
+    <meta property="og:title" content="Lattice attacks: recovering keys from biased nonces" />
+    <meta property="og:description" content="Nonces don't have to fully repeat. If a few bits are predictable, LLL lattice reduction can recover an ECDSA private key from as few as 2–4 signatures." />
+    <meta property="og:url" content="https://0xguessr.sanjaycj.com/lattice" />
+    <meta property="og:image" content="https://0xguessr.sanjaycj.com/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Lattice attacks: recovering keys from biased nonces" />
+    <meta name="twitter:description" content="Nonces don't have to fully repeat. If a few bits are predictable, LLL lattice reduction can recover an ECDSA private key from as few as 2–4 signatures." />
+    <meta name="twitter:image" content="https://0xguessr.sanjaycj.com/og.png" />
+
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Lattice attacks: recovering keys from biased nonces","description":"Nonces don't have to fully repeat. If a few bits are predictable, LLL lattice reduction can recover an ECDSA private key from as few as 2–4 signatures.","author":{"@type":"Organization","name":"0xguessr"},"publisher":{"@type":"Organization","name":"0xguessr"},"mainEntityOfPage":"https://0xguessr.sanjaycj.com/lattice"}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://0xguessr.sanjaycj.com/"},{"@type":"ListItem","position":2,"name":"Learn","item":"https://0xguessr.sanjaycj.com/learn"},{"@type":"ListItem","position":3,"name":"Lattice","item":"https://0xguessr.sanjaycj.com/lattice"}]}</script>
+
+    <link rel="stylesheet" href="/src/styles/learn.css" />
+  </head>
+  <body>
+    <nav class="learn-nav">
+      <a href="/" class="brand">0xguessr</a>
+      <a href="/" class="play-btn">← Play the slot machine</a>
+    </nav>
+
+    <article>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a> <span aria-hidden="true">›</span>
+        <a href="/learn">Learn</a> <span aria-hidden="true">›</span>
+        <span>Lattice</span>
+      </nav>
+
+      <h1 class="hero-title">Lattice attacks: recovering keys from biased nonces</h1>
+      <p class="hero-sub">Nonce reuse is the obvious failure. The subtle one: nonces that are merely biased — a few predictable bits — still leak the key, via lattice reduction.</p>
+
+      <h2>The Hidden Number Problem</h2>
+      <p>Suppose an implementation's nonces are not repeated, but are slightly predictable — say the top few bits are always zero because of a weak RNG, a timing side channel, or a buggy hardware wallet. Each signature then gives a noisy linear equation about the private key. Collect a handful of them and you have an instance of the <strong>Hidden Number Problem</strong>, which can be solved with <strong>LLL lattice basis reduction</strong>.</p>
+      <p>With a 128-bit bias, two signatures can be enough; with a smaller ~64-bit bias, around four. That is a remarkably low bar — an attacker who can collect a few signatures from a leaky device can walk away with the key.</p>
+
+      <h2>Real-world examples</h2>
+      <p>Lattice attacks are the engine behind several disclosed bugs, including <strong>Minerva</strong> and <strong>TPM-Fail</strong> (timing side channels that leaked nonce bits from smartcards and TPMs) and various hardware-wallet nonce-generation flaws. They are a standard tool in cryptographic auditing.</p>
+
+      <h2>The defense</h2>
+      <p>Generate nonces with a secure, constant-time process — again, RFC 6979 deterministic nonces plus side-channel-resistant implementations. This mode runs LLL reduction over a set of signatures you provide and, if the nonces were biased, recovers and verifies the key.</p>
+    
+      <div class="try-cta">
+        <a href="/?mode=lattice" class="try-btn">▶ Try the Lattice mode in the game</a>
+      </div>
+
+      <p style="margin-top:1.75rem">
+        <a href="/learn">← Back to all attack vectors</a>
+      </p>
+    </article>
+
+    <footer>
+      <p>
+        0xguessr — an educational demonstration. Sources are linked inline;
+        figures are approximate and reflect public reporting at the time of writing.
+      </p>
+      <p><a href="https://github.com/scjtools/0xguessr" target="_blank" rel="noopener">Source on GitHub</a></p>
+    </footer>
+  </body>
+</html>

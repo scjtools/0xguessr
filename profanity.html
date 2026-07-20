@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Profanity Vanity-Address Flaw &amp; the $160M Wintermute Hack | 0xguessr</title>
+    <meta name="description" content="The Profanity vanity-address tool seeded its RNG with just 32 bits, making every key it produced brute-forceable. It caused the $160M Wintermute hack in 2022." />
+    <link rel="canonical" href="https://0xguessr.sanjaycj.com/profanity" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#0d0e12" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="0xguessr" />
+    <meta property="og:title" content="Profanity: the vanity-address flaw behind the $160M Wintermute hack" />
+    <meta property="og:description" content="The Profanity vanity-address tool seeded its RNG with just 32 bits, making every key it produced brute-forceable. It caused the $160M Wintermute hack in 2022." />
+    <meta property="og:url" content="https://0xguessr.sanjaycj.com/profanity" />
+    <meta property="og:image" content="https://0xguessr.sanjaycj.com/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Profanity: the vanity-address flaw behind the $160M Wintermute hack" />
+    <meta name="twitter:description" content="The Profanity vanity-address tool seeded its RNG with just 32 bits, making every key it produced brute-forceable. It caused the $160M Wintermute hack in 2022." />
+    <meta name="twitter:image" content="https://0xguessr.sanjaycj.com/og.png" />
+
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Profanity: the vanity-address flaw behind the $160M Wintermute hack","description":"The Profanity vanity-address tool seeded its RNG with just 32 bits, making every key it produced brute-forceable. It caused the $160M Wintermute hack in 2022.","author":{"@type":"Organization","name":"0xguessr"},"publisher":{"@type":"Organization","name":"0xguessr"},"mainEntityOfPage":"https://0xguessr.sanjaycj.com/profanity"}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://0xguessr.sanjaycj.com/"},{"@type":"ListItem","position":2,"name":"Learn","item":"https://0xguessr.sanjaycj.com/learn"},{"@type":"ListItem","position":3,"name":"Profanity","item":"https://0xguessr.sanjaycj.com/profanity"}]}</script>
+
+    <link rel="stylesheet" href="/src/styles/learn.css" />
+  </head>
+  <body>
+    <nav class="learn-nav">
+      <a href="/" class="brand">0xguessr</a>
+      <a href="/" class="play-btn">← Play the slot machine</a>
+    </nav>
+
+    <article>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a> <span aria-hidden="true">›</span>
+        <a href="/learn">Learn</a> <span aria-hidden="true">›</span>
+        <span>Profanity</span>
+      </nav>
+
+      <h1 class="hero-title">Profanity: the vanity-address flaw behind the $160M Wintermute hack</h1>
+      <p class="hero-sub">Profanity generated custom "vanity" addresses with chosen prefixes. Its fatal flaw: every key it ever produced came from only 2^32 possibilities — and the process was reversible.</p>
+
+      <div class="case">
+        <div class="meta">
+          <span><b>Disclosed:</b> Sep 2022, by 1inch</span>
+          <span><b>Headline loss:</b> $160M (Wintermute)</span>
+          <span><b>Effective keyspace:</b> 2<sup>32</sup></span>
+        </div>
+      </div>
+
+      <h2>How the flaw worked</h2>
+      <p>Profanity let users brute-force pretty addresses — say, one starting with seven zeros. To do that quickly it seeded a 256-bit <code>mt19937_64</code> generator with a single 32-bit value from <code>random_device</code>. That means every private key it ever produced traces back to one of only <strong>2<sup>32</sup> ≈ 4.3 billion</strong> seeds. Worse, the generator's steps are reversible, so an attacker can start from any Profanity-generated <em>public</em> address and walk backwards to the seed, then forwards to the private key.</p>
+
+      <h2>The Wintermute hack</h2>
+      <p>In September 2022, the market-maker <strong>Wintermute</strong> lost about $160 million. The attacker cracked a Profanity-generated admin wallet with a seven-zero vanity address. Wintermute had moved funds out of the hot wallet after 1inch published the flaw, but failed to revoke the wallet's admin permissions over their vault — so the recovered key was still enough to drain it.</p>
+      <p><a href="https://medium.com/amber-group/exploiting-the-profanity-flaw-e986576de7ab" target="_blank" rel="noopener">Amber Group's technical breakdown →</a></p>
+
+      <h2>The defense</h2>
+      <p>Any address ever generated by Profanity should be considered compromised — move all funds and revoke every permission it holds. Vanity addresses are fine in principle, but only from a tool that draws full 256-bit entropy from a secure RNG.</p>
+    
+      <div class="try-cta">
+        <a href="/?mode=profanity" class="try-btn">▶ Try the Profanity mode in the game</a>
+      </div>
+
+      <p style="margin-top:1.75rem">
+        <a href="/learn">← Back to all attack vectors</a>
+      </p>
+    </article>
+
+    <footer>
+      <p>
+        0xguessr — an educational demonstration. Sources are linked inline;
+        figures are approximate and reflect public reporting at the time of writing.
+      </p>
+      <p><a href="https://github.com/scjtools/0xguessr" target="_blank" rel="noopener">Source on GitHub</a></p>
+    </footer>
+  </body>
+</html>

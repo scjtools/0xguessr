@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Cross-Chain Key Reuse: One Key, Many Blockchains | 0xguessr</title>
+    <meta name="description" content="The same private key controls a different address on Bitcoin and Ethereum. If a key leaks on one chain, funds on every other chain that reused it are exposed too." />
+    <link rel="canonical" href="https://0xguessr.sanjaycj.com/cross-chain" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#0d0e12" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="0xguessr" />
+    <meta property="og:title" content="Cross-chain key reuse" />
+    <meta property="og:description" content="The same private key controls a different address on Bitcoin and Ethereum. If a key leaks on one chain, funds on every other chain that reused it are exposed too." />
+    <meta property="og:url" content="https://0xguessr.sanjaycj.com/cross-chain" />
+    <meta property="og:image" content="https://0xguessr.sanjaycj.com/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Cross-chain key reuse" />
+    <meta name="twitter:description" content="The same private key controls a different address on Bitcoin and Ethereum. If a key leaks on one chain, funds on every other chain that reused it are exposed too." />
+    <meta name="twitter:image" content="https://0xguessr.sanjaycj.com/og.png" />
+
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Cross-chain key reuse","description":"The same private key controls a different address on Bitcoin and Ethereum. If a key leaks on one chain, funds on every other chain that reused it are exposed too.","author":{"@type":"Organization","name":"0xguessr"},"publisher":{"@type":"Organization","name":"0xguessr"},"mainEntityOfPage":"https://0xguessr.sanjaycj.com/cross-chain"}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://0xguessr.sanjaycj.com/"},{"@type":"ListItem","position":2,"name":"Learn","item":"https://0xguessr.sanjaycj.com/learn"},{"@type":"ListItem","position":3,"name":"Cross-chain","item":"https://0xguessr.sanjaycj.com/cross-chain"}]}</script>
+
+    <link rel="stylesheet" href="/src/styles/learn.css" />
+  </head>
+  <body>
+    <nav class="learn-nav">
+      <a href="/" class="brand">0xguessr</a>
+      <a href="/" class="play-btn">← Play the slot machine</a>
+    </nav>
+
+    <article>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a> <span aria-hidden="true">›</span>
+        <a href="/learn">Learn</a> <span aria-hidden="true">›</span>
+        <span>Cross-chain</span>
+      </nav>
+
+      <h1 class="hero-title">Cross-chain key reuse</h1>
+      <p class="hero-sub">A private key is just a number. The same number produces a Bitcoin address and an Ethereum address. Expose it once, anywhere, and every chain that reused it is open.</p>
+
+      <h2>How it works</h2>
+      <p>Bitcoin and Ethereum both use the secp256k1 curve; they only differ in how the public key is turned into an address. So a single 256-bit private key controls one address on Bitcoin and a different one on Ethereum — but it is the <em>same secret</em>. If that secret was ever exposed on Bitcoin — through nonce reuse, a weak RNG, or being published in security research — then the corresponding Ethereum address is equally open, even if no one has looked there yet.</p>
+      <p>This mode takes a list of private keys known to be compromised on Bitcoin (puzzle keys, published research keys, nonce-reuse victims) and checks whether the same key ever held ETH.</p>
+
+      <h2>Why it happens</h2>
+      <p>People reuse keys for convenience, or import a Bitcoin wallet into a multi-chain tool without realising the key is shared. Thousands of keys have been published over the years in write-ups and datasets; any funds sent to their Ethereum addresses can be swept by anyone watching.</p>
+
+      <h2>The defense</h2>
+      <p>Never reuse a private key across chains, and never import a key that has ever been exposed anywhere. Generate fresh, independent keys per wallet, and treat any key that has appeared in public — even years ago on a different chain — as permanently burned.</p>
+    
+      <div class="try-cta">
+        <a href="/?mode=crosschain" class="try-btn">▶ Try the Cross-chain mode in the game</a>
+      </div>
+
+      <p style="margin-top:1.75rem">
+        <a href="/learn">← Back to all attack vectors</a>
+      </p>
+    </article>
+
+    <footer>
+      <p>
+        0xguessr — an educational demonstration. Sources are linked inline;
+        figures are approximate and reflect public reporting at the time of writing.
+      </p>
+      <p><a href="https://github.com/scjtools/0xguessr" target="_blank" rel="noopener">Source on GitHub</a></p>
+    </footer>
+  </body>
+</html>
