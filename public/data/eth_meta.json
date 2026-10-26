@@ -1,13 +1,13 @@
 {
-  "snapshot_date": "2026-10-19T12:13:35.284Z",
+  "snapshot_date": "2026-10-26T12:19:46.284Z",
   "source": "Google BigQuery crypto_ethereum.balances (>= 1 ETH)",
   "query": "eth_balance >= 1000000000000000000 (>= 1 ETH)",
-  "address_count": 1465572,
-  "bloom_m_bits": 42142784,
+  "address_count": 1463877,
+  "bloom_m_bits": 42094040,
   "bloom_k_hashes": 20,
   "fp_rate": 0.000001,
-  "file_size_bytes": 5267864,
-  "total_eth_approx": 167313948,
-  "eth_usd_approx": 2418.985,
-  "price_snapshot_date": "2026-10-19"
+  "file_size_bytes": 5261771,
+  "total_eth_approx": 167748313,
+  "eth_usd_approx": 2326.415,
+  "price_snapshot_date": "2026-10-26"
 }
